@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro - DOFUS FACHO 1.40.1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --panel-dark: #1a1a2e;
+      --panel-dark-accent: #16213e;
+      --form-bg: #ffffff;
+      --input-border: #e0e0e0;
+      --valid: #22c55e;
+      --invalid: #eab308;
+      --error: #ef4444;
+      --btn-primary: #0a5a28;
+      --btn-hover: #22c55e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #1A201A 0%, #283828 18%, #3A5A3A 45%, #5A7C5A 70%, #283828 100%);
+      padding: 16px;
+    }
+
+    .container {
+      display: flex;
+      width: 100%;
+      max-width: 900px;
+      height: 100%;
+      max-height: calc(100vh - 32px);
+      min-height: 0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .panel-left {
+      width: 42%;
+      min-width: 280px;
+      background: var(--panel-dark);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 32px 24px 0 24px;
+    }
+
+    .panel-left h1 {
+      color: #fff;
+      font-size: 1.75rem;
+      font-weight: 700;
+      align-self: flex-start;
+      letter-spacing: -0.02em;
+      position: relative;
+      z-index: 1;
+    }
+
+    .panel-left .image-wrap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .panel-left .image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+
+    }
+
+    .panel-right {
+      width: 58%;
+      min-width: 0;
+      background: var(--form-bg);
+      padding: 16px 24px 20px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .form-title {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #64748b;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .form-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 20px;
+    }
+
+    .form-columns .submit-wrap {
+      grid-column: 1 / -1;
+      margin-top: 16px;
+    }
+
+    .field {
+      margin-bottom: 10px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #475569;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 6px 32px 6px 0;
+      font-size: 0.95rem;
+      color: #0f172a;
+      border: none;
+      border-bottom: 2px solid var(--input-border);
+      background: transparent;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .field select {
+      padding-right: 12px;
+      cursor: pointer;
+      appearance: auto;
+    }
+
+    .field input::placeholder {
+      color: #94a3b8;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--btn-primary);
+    }
+
+    .field.input-valid input,
+    .field.input-valid select {
+      border-color: var(--valid);
+    }
+
+    .field.input-invalid input,
+    .field.input-invalid select {
+      border-color: var(--invalid);
+    }
+
+    .field.input-error input,
+    .field.input-error select {
+      border-color: var(--error);
+    }
+
+    .field-wrap {
+      position: relative;
+    }
+
+    .field-wrap .icon {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+    }
+
+    .field-wrap .icon.valid {
+      color: var(--valid);
+    }
+
+    .field-wrap .icon.invalid {
+      color: var(--invalid);
+    }
+
+    .field-wrap .icon.error {
+      color: var(--error);
+    }
+
+    .field-msg {
+      font-size: 0.75rem;
+      margin-top: 4px;
+      color: var(--error);
+    }
+
+    .submit-wrap {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+    }
+
+    .btn-submit {
+      background: var(--btn-primary);
+      color: #fff;
+      border: none;
+      padding: 12px 32px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-submit:hover {
+      background: var(--btn-hover);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    #success-view {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    #success-view.visible {
+      display: flex;
+    }
+
+    #form-view.hidden {
+      display: none;
+    }
+
+    #success-view h2 {
+      font-size: 1.5rem;
+      color: var(--valid);
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    #success-view p {
+      color: #64748b;
+      font-size: 0.95rem;
+    }
+
+    .global-error {
+      background: #fef2f2;
+      color: var(--error);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .global-error.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="panel-left">
+      <h1>DOFUS FACHO 1.40.1</h1>
+      <div class="image-wrap">
+        <img src="images.jfif" alt="">
+      </div>
+    </div>
+    <div class="panel-right">
+      <div id="form-view">
+        <p class="form-title">Registro de cuenta</p>
+        <div class="global-error" id="global-error" role="alert"></div>
+        <form id="registro-form" novalidate>
+          <div class="form-columns">
+            <div class="form-col">
+              <div class="field" data-name="cuenta">
+                <label for="cuenta">Nombre de cuenta</label>
+                <div class="field-wrap">
+                  <input type="text" id="cuenta" name="cuenta" placeholder="Ej: xX_PussyDestroyer_Xx" autocomplete="username">
+                  <span class="icon" aria-hidden="true"></span>
+                </div>
+                <span class="field-msg" id="msg-cuenta"></span>
+              </div>
+              <div class="field" data-name="email">
+                <label for="email">Email</label>
+                <div class="field-wrap">
+                  <input type="email" id="email" name="email" placeholder="Ej: correo@ejemplo.com" autocomplete="email">
+                  <span class="icon" aria-hidden="true"></span>
+                </div>
+                <span class="field-msg" id="msg-email"></span>
+              </div>
+              <div class="field" data-name="nombre">
+                <label for="nombre">Nombre</label>
+                <div class="field-wrap">
+                  <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan" autocomplete="given-name">
+                  <span class="icon" aria-hidden="true"></span>
+                </div>
+                <span class="field-msg" id="msg-nombre"></span>
+              </div>
+              <div class="field" data-name="apellido">
+                <label for="apellido">Apellido</label>
+                <div class="field-wrap">
+                  <input type="text" id="apellido" name="apellido" placeholder="Ej: Pérez" autocomplete="family-name">
+                  <span class="icon" aria-hidden="true"></span>
+                </div>
+                <span class="field-msg" id="msg-apellido"></span>
+              </div>
+              <div class="field" data-name="pais">
+                <label for="pais">País</label>
+                <div class="field-wrap">
+                  <select id="pais" name="pais" required>
+                    <option value="">Selecciona un país</option>
+                    <option value="AR">🇦🇷 Argentina</option>
+                    <option value="CO">🇨🇴 Colombia</option>
+                    <option value="ES">🇪🇸 España</option>
+                    <option value="MX">🇲🇽 México</option>
+                    <option value="CL">🇨🇱 Chile</option>
+                    <option value="PE">🇵🇪 Perú</option>
+                    <option value="VE">🇻🇪 Venezuela</option>
+                    <option value="EC">🇪🇨 Ecuador</option>
+                    <option value="UY">🇺🇾 Uruguay</option>
+                    <option value="PY">🇵🇾 Paraguay</option>
+                    <option value="BO">🇧🇴 Bolivia</option>
+                    <option value="BR">🇧🇷 Brasil</option>
+                    <option value="US">🇺🇸 Estados Unidos</option>
+                    <option value="FR">🇫🇷 Francia</option>
+                    <option value="IT">🇮🇹 Italia</option>
+                    <option value="DE">🇩🇪 Alemania</option>
+                    <option value="OT">🌐 Otro</option>
+                  </select>
+                  <span class="icon" aria-hidden="true"></span>
+                </div>
+                <span class="field-msg" id="msg-pais"></span>
+              </div>
+            </div>
+            <div class="form-col">
+              <div class="field" data-name="pass">
+                <label for="pass">Contraseña</label>
+                <div class="field-wrap">
+                  <input type="password" id="pass" name="pass" placeholder="••••••••" autocomplete="new-password">
+                  <span class="icon" aria-hidden="true"></span>
+                </div>
+                <span class="field-msg" id="msg-pass"></span>
+              </div>
+              <div class="field" data-name="pass2">
+                <label for="pass2">Confirmar contraseña</label>
+                <div class="field-wrap">
+                  <input type="password" id="pass2" name="pass2" placeholder="••••••••" autocomplete="new-password">
+                  <span class="icon" aria-hidden="true"></span>
+                </div>
+                <span class="field-msg" id="msg-pass2"></span>
+              </div>
+              <div class="field" data-name="apodo">
+                <label for="apodo">Apodo</label>
+                <div class="field-wrap">
+                  <input type="text" id="apodo" name="apodo" placeholder="Ej: JugadorPro" autocomplete="nickname">
+                  <span class="icon" aria-hidden="true"></span>
+                </div>
+                <span class="field-msg" id="msg-apodo"></span>
+              </div>
+            </div>
+            <div class="submit-wrap">
+              <button type="submit" class="btn-submit" id="btn-submit">Registrarme</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div id="success-view">
+        <h2>Registro exitoso</h2>
+        <p>Tu cuenta ha sido creada. Ya puedes iniciar sesión en el juego.</p>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

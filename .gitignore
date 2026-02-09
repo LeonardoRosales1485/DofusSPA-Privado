@@ -1,0 +1,6 @@
+# Dependencias
+node_modules/
+
+# Documentación y texto (no necesarios para ejecutar la SPA)
+*.md
+*.txt
