@@ -1,8 +1,7 @@
 {
   "version": 2,
   "functions": {
-    "api/registro.js": {
-      "maxDuration": 10
-    }
+    "api/registro.js": { "maxDuration": 10 },
+    "api/serve-image.js": { "maxDuration": 5 }
   }
 }
