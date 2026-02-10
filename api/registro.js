@@ -18,6 +18,8 @@ function getDbConfig() {
 }
 
 async function doRegistro(body) {
+  console.log('[registro] body keys:', Object.keys(body || {}));
+
   const cuenta = String(body.cuenta || '').trim();
   const pass = String(body.pass || '');
   const nombre = String(body.nombre || '').trim();
@@ -27,6 +29,7 @@ async function doRegistro(body) {
   const apodo = String(body.apodo || '').trim();
 
   if (!cuenta || !pass || !nombre || !apellido || !pais || !email || !apodo) {
+    console.log('[registro] validación: faltan datos', { cuenta: !!cuenta, pass: !!pass, nombre: !!nombre, apellido: !!apellido, pais: !!pais, email: !!email, apodo: !!apodo });
     return { status: 400, json: { success: false, message: 'Faltan datos obligatorios.' } };
   }
 
@@ -41,11 +44,15 @@ async function doRegistro(body) {
     return { status: 400, json: { success: false, message: 'Apodo máximo 30 caracteres.' } };
   }
 
+  const dbConfig = getDbConfig();
+  console.log('[registro] conectando BD', { host: dbConfig.host, port: dbConfig.port, database: dbConfig.database, user: dbConfig.user, hasPassword: !!dbConfig.password, ssl: !!dbConfig.ssl });
+
   let conn;
   try {
-    conn = await mysql.createConnection(getDbConfig());
+    conn = await mysql.createConnection(dbConfig);
+    console.log('[registro] conexión BD OK');
   } catch (err) {
-    console.error('Conexión BD:', err.message);
+    console.error('[registro] Conexión BD fallida:', err.code, err.message, err.cause || '');
     return {
       status: 500,
       json: {
@@ -115,9 +122,10 @@ async function doRegistro(body) {
       ticket,
     ]);
 
+    console.log('[registro] INSERT OK, id:', nextId);
     return { status: 200, json: { success: true, message: 'Registro exitoso.' } };
   } catch (err) {
-    console.error('Error registro:', err.message);
+    console.error('[registro] Error registro:', err.code, err.message, err.sql || '');
     const msg =
       err.code === 'ER_BAD_FIELD_ERROR' || err.code === 'ER_NO_SUCH_TABLE'
         ? 'Error de base de datos. Revisa que la tabla cuentas exista y tenga las columnas esperadas.'
@@ -129,6 +137,8 @@ async function doRegistro(body) {
 }
 
 module.exports = async (req, res) => {
+  console.log('[registro] request', req.method, req.url || '');
+
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -140,14 +150,18 @@ module.exports = async (req, res) => {
   }
 
   if (req.method !== 'POST') {
+    console.log('[registro] método no permitido:', req.method);
     res.status(405).json({ success: false, message: 'Método no permitido.' });
     return;
   }
 
   let body = typeof req.body === 'object' && req.body !== null ? req.body : {};
   if (Object.keys(body).length === 0 && typeof req.body === 'string') {
-    try { body = JSON.parse(req.body); } catch (_) {}
+    try { body = JSON.parse(req.body); } catch (e) { console.log('[registro] body parse error:', e.message); }
   }
+  console.log('[registro] body después de parse:', typeof req.body, Object.keys(body || {}).length);
+
   const result = await doRegistro(body);
+  console.log('[registro] respuesta', result.status, result.json?.success);
   res.status(result.status).json(result.json);
 };
