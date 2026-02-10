@@ -1,6 +1,10 @@
 (function () {
+  console.log('[registro-app] script cargado');
   const form = document.getElementById('registro-form');
-  if (!form) return;
+  if (!form) {
+    console.log('[registro-app] ERROR: no se encontró #registro-form');
+    return;
+  }
   const formView = document.getElementById('form-view');
   const successView = document.getElementById('success-view');
   const globalError = document.getElementById('global-error');
@@ -150,8 +154,10 @@
   }
 
   function enviarRegistro() {
+    console.log('[registro-app] enviarRegistro() llamado');
     hideGlobalError();
     if (!runValidation()) {
+      console.log('[registro-app] validación fallida');
       showGlobalError('Revisa los campos marcados y complétalos correctamente.');
       return;
     }
@@ -159,21 +165,30 @@
     var formData = new FormData(form);
     formData.delete('pass2');
     var body = Object.fromEntries(formData);
+    console.log('[registro-app] enviando al BE (cuenta, email, etc.):', { cuenta: body.cuenta, email: body.email, nombre: body.nombre, apellido: body.apellido, pais: body.pais, apodo: body.apodo });
     fetch('/api/registro', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     })
-      .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+      .then(function (res) {
+        return res.json().then(function (data) {
+          console.log('[registro-app] respuesta del BE recibida:', res.status, data);
+          return { ok: res.ok, data: data };
+        });
+      })
       .then(function (result) {
         if (result.ok && result.data && result.data.success) {
+          console.log('[registro-app] OK: información enviada al BE correctamente, registro exitoso');
           showSuccess();
         } else {
+          console.log('[registro-app] BE respondió con error:', result.data);
           showGlobalError((result.data && result.data.message) || 'Error al registrar. Intenta de nuevo.');
           if (btnSubmit) btnSubmit.disabled = false;
         }
       })
-      .catch(function () {
+      .catch(function (err) {
+        console.log('[registro-app] error de conexión al BE:', err);
         showGlobalError('Error de conexión. Comprueba que el servidor esté activo.');
         if (btnSubmit) btnSubmit.disabled = false;
       });
@@ -182,13 +197,18 @@
   if (btnSubmit) {
     btnSubmit.addEventListener('click', function (e) {
       e.preventDefault();
+      console.log('[registro-app] botón Registrarme clicado');
       enviarRegistro();
     });
+    console.log('[registro-app] listener de clic en botón registrado');
+  } else {
+    console.log('[registro-app] ERROR: no se encontró #btn-submit');
   }
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     e.stopPropagation();
+    console.log('[registro-app] form submit (ej. Enter)');
     enviarRegistro();
   });
 
