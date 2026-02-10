@@ -1,5 +1,6 @@
 (function () {
   const form = document.getElementById('registro-form');
+  if (!form) return;
   const formView = document.getElementById('form-view');
   const successView = document.getElementById('success-view');
   const globalError = document.getElementById('global-error');
