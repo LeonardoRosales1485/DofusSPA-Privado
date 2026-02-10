@@ -150,6 +150,7 @@
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
+    e.stopPropagation();
     hideGlobalError();
     if (!runValidation()) {
       showGlobalError('Revisa los campos marcados y complétalos correctamente.');

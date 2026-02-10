@@ -138,7 +138,10 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const body = typeof req.body === 'object' && req.body !== null ? req.body : {};
+  let body = typeof req.body === 'object' && req.body !== null ? req.body : {};
+  if (Object.keys(body).length === 0 && typeof req.body === 'string') {
+    try { body = JSON.parse(req.body); } catch (_) {}
+  }
   const result = await doRegistro(body);
   res.status(result.status).json(result.json);
 };
