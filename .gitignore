@@ -1,6 +1,9 @@
 # Dependencias
 node_modules/
 
+# Configuración con credenciales (usar config.example.js como plantilla)
+config.js
+
 # Documentación y texto (no necesarios para ejecutar la SPA)
 *.md
 *.txt
