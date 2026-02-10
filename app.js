@@ -149,15 +149,13 @@
     successView.classList.add('visible');
   }
 
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    e.stopPropagation();
+  function enviarRegistro() {
     hideGlobalError();
     if (!runValidation()) {
       showGlobalError('Revisa los campos marcados y complétalos correctamente.');
       return;
     }
-    btnSubmit.disabled = true;
+    if (btnSubmit) btnSubmit.disabled = true;
     var formData = new FormData(form);
     formData.delete('pass2');
     var body = Object.fromEntries(formData);
@@ -172,13 +170,26 @@
           showSuccess();
         } else {
           showGlobalError((result.data && result.data.message) || 'Error al registrar. Intenta de nuevo.');
-          btnSubmit.disabled = false;
+          if (btnSubmit) btnSubmit.disabled = false;
         }
       })
       .catch(function () {
         showGlobalError('Error de conexión. Comprueba que el servidor esté activo.');
-        btnSubmit.disabled = false;
+        if (btnSubmit) btnSubmit.disabled = false;
       });
+  }
+
+  if (btnSubmit) {
+    btnSubmit.addEventListener('click', function (e) {
+      e.preventDefault();
+      enviarRegistro();
+    });
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    enviarRegistro();
   });
 
   ['cuenta', 'pass', 'pass2', 'nombre', 'apellido', 'pais', 'email', 'apodo'].forEach(function (name) {
