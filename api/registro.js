@@ -149,6 +149,12 @@ module.exports = async (req, res) => {
     return;
   }
 
+  if (req.method === 'GET') {
+    console.log('[registro] GET (prueba): función ejecutándose');
+    res.status(200).json({ api: 'registro', method: 'GET', message: 'Backend OK. Usa POST para registrar.' });
+    return;
+  }
+
   if (req.method !== 'POST') {
     console.log('[registro] método no permitido:', req.method);
     res.status(405).json({ success: false, message: 'Método no permitido.' });

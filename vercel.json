@@ -2,6 +2,7 @@
   "version": 2,
   "functions": {
     "api/registro.js": { "maxDuration": 10 },
-    "api/serve-image.js": { "maxDuration": 5 }
+    "api/serve-image.js": { "maxDuration": 5 },
+    "api/health.js": { "maxDuration": 5 }
   }
 }
