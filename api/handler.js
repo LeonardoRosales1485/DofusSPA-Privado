@@ -121,6 +121,31 @@ async function userObjetos(req, res) {
   }
 }
 
+// --- User: detalle de un objeto (todas las columnas) ---
+async function userObjetoDetalle(req, res) {
+  const cuentaId = parseInt(req.headers['x-cuenta-id'] || req.query.cuentaId, 10);
+  if (!cuentaId || isNaN(cuentaId)) return res.status(401).json({ success: false, message: 'Sesión inválida.' });
+  const id = parseInt(req.query.id, 10);
+  if (!id || isNaN(id)) return res.status(400).json({ success: false, message: 'ID de objeto inválido.' });
+  let conn;
+  try {
+    conn = await mysql.createConnection(getDbConfig(process.env.DB_ESTATICOS || 'bustar_estaticos'));
+    const [rows] = await conn.execute('SELECT * FROM objetos_modelo WHERE id = ? LIMIT 1', [id]);
+    if (!rows || rows.length === 0) return res.status(404).json({ success: false, message: 'Objeto no encontrado.' });
+    const raw = rows[0];
+    function anyKey(obj, ...names) {
+      for (const n of names) if (obj[n] !== undefined) return obj[n]; return undefined;
+    }
+    const data = { ...raw, nombre: anyKey(raw, 'nombre', 'Nombre'), nivel: anyKey(raw, 'nivel', 'Nivel'), pods: anyKey(raw, 'pods', 'Pods'), gfx: anyKey(raw, 'gfx', 'Gfx'), condicion: anyKey(raw, 'condicion', 'Condicion'), statsModelo: anyKey(raw, 'statsModelo', 'statsmodelo', 'stats_modelo'), infosArma: anyKey(raw, 'infosArma', 'infosarma', 'infos_arma'), setID: anyKey(raw, 'setID', 'setid', 'set_id') };
+    res.status(200).json({ success: true, data });
+  } catch (err) {
+    console.error('[handler user/objeto-detalle]', err.message);
+    res.status(500).json({ success: false, message: 'Error al cargar detalle.' });
+  } finally {
+    if (conn) try { conn.end(); } catch (e) {}
+  }
+}
+
 // --- User: inventario ---
 async function userInventario(req, res) {
   const cuentaId = parseInt(req.headers['x-cuenta-id'] || req.query.cuentaId, 10);
@@ -477,6 +502,7 @@ const userRoutes = {
   login: { method: 'POST', fn: userLogin },
   personajes: { method: 'GET', fn: userPersonajes },
   objetos: { method: 'GET', fn: userObjetos },
+  'objeto-detalle': { method: 'GET', fn: userObjetoDetalle },
   panes: { method: 'GET', fn: userPanes },
   inventario: { method: 'GET', fn: userInventario },
   'dar-objetos': { method: 'POST', fn: userDarObjetos },

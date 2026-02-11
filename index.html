@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registro - DOFUS FACHO 1.40.1</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/x-icon" href="/api/serve-favicon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -376,9 +376,46 @@
     #user-inventario-view .inventario-list, #admin-inventario-view .inventario-list { max-height: 400px; overflow: auto; border: 1px solid var(--input-border); border-radius: 8px; padding: 8px; background: #f8fafc; }
     #user-inventario-view .inventario-item, #admin-inventario-view .inventario-item { padding: 8px 12px; font-size: 0.9rem; border-radius: 4px; margin-bottom: 4px; background: #fff; border: 1px solid var(--input-border); }
     #user-inventario-view .inventario-item:last-child, #admin-inventario-view .inventario-item:last-child { margin-bottom: 0; }
-    #user-dar-objeto-view .dar-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; min-height: 0; }
+    #user-dar-objeto-view .dar-builds-link { font-size: 0.9rem; margin-bottom: 8px; }
+    #user-dar-objeto-view .dar-builds-link a { color: var(--btn-primary); text-decoration: none; }
+    #user-dar-objeto-view .dar-builds-link a:hover { text-decoration: underline; }
+    #user-dar-objeto-view .dar-layout { display: flex; flex-direction: column; gap: 24px; min-height: 0; }
+    #user-dar-objeto-view .dar-ids-bar { padding: 12px; border: 1px solid var(--input-border); border-radius: 8px; background: #f8fafc; }
+    #user-dar-objeto-view .dar-ids-bar label { font-size: 0.75rem; font-weight: 600; color: #475569; display: block; margin-bottom: 6px; }
+    #user-dar-objeto-view .dar-ids-bar .input-ids { width: 100%; min-height: 56px; margin-bottom: 8px; }
+    #user-dar-objeto-view .dar-detail-wrap { min-height: 200px; display: flex; flex-direction: column; }
     #user-dar-objeto-view .dar-left { display: flex; flex-direction: column; min-width: 0; }
-    #user-dar-objeto-view .dar-right { display: flex; flex-direction: column; }
+    #user-dar-objeto-view .dar-detail { display: flex; flex-direction: column; min-width: 0; min-height: 200px; border: 1px solid var(--input-border); border-radius: 8px; padding: 12px; background: #f8fafc; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-placeholder { color: #94a3b8; font-size: 0.9rem; text-align: center; padding: 24px 12px; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-content { display: none; }
+    #user-dar-objeto-view .dar-detail.objeto-selected > .objeto-detail-placeholder { display: none; }
+    #user-dar-objeto-view .dar-detail.objeto-selected .objeto-detail-content { display: block; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-msg { color: #64748b; font-size: 0.9rem; padding: 12px 0; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-fields { max-height: 420px; overflow: auto; margin-bottom: 8px; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--input-border); }
+    #user-dar-objeto-view .dar-detail .objeto-detail-title { font-weight: 700; font-size: 1rem; color: #334155; margin: 0; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-meta { font-size: 0.85rem; color: #64748b; white-space: nowrap; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-body { display: grid; grid-template-columns: auto 1fr; gap: 12px; margin-bottom: 12px; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-col-image { background: #334155; border-radius: 8px; padding: 12px; text-align: center; min-width: 80px; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-img { width: 56px; height: 56px; object-fit: contain; display: block; margin: 0 auto 6px; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-set { font-size: 0.75rem; color: #e2e8f0; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-img-placeholder { font-size: 0.7rem; color: #94a3b8; display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; margin: 0 auto 6px; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-img-placeholder.show { display: flex !important; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-table { display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: auto auto; gap: 0; font-size: 0.8rem; border: 1px solid var(--input-border); border-radius: 6px; overflow: hidden; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-th { background: #e2e8f0; color: #334155; padding: 6px 8px; text-align: left; font-weight: 600; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-td { padding: 6px 8px; border-top: 1px solid var(--input-border); background: #fff; vertical-align: top; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-table .cell-list { margin: 0; padding-left: 14px; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-table .cell-list li { margin-bottom: 2px; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-receta { margin-top: 8px; font-size: 0.85rem; color: #475569; border-top: 1px solid var(--input-border); padding-top: 8px; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-receta strong { color: #334155; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-desc { margin-top: 8px; font-size: 0.85rem; color: #64748b; font-style: italic; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-row { margin-bottom: 8px; font-size: 0.9rem; }
+    #user-dar-objeto-view .dar-detail .objeto-detail-row strong { color: #475569; }
+    #user-dar-objeto-view .dar-detail .btn-anadir-objeto { margin-top: 12px; width: 100%; padding: 10px 16px; font-size: 0.95rem; font-weight: 600; background: var(--btn-primary); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-family: inherit; }
+    #user-dar-objeto-view .dar-detail .btn-anadir-objeto:hover { background: var(--btn-hover); }
+    #user-dar-objeto-view .dar-detail-wrap .dar-detail { flex: 1; min-height: 200px; }
+    .container.hide-panel-left .panel-left { display: none; }
+    .container.hide-panel-left .panel-right { width: 100%; min-width: 0; }
     #user-dar-objeto-view .busqueda-objetos { margin-bottom: 8px; padding: 8px 12px; font-size: 0.95rem; border: 2px solid var(--input-border); border-radius: 6px; }
     #user-dar-objeto-view .list-wrap-objetos { max-height: 280px; overflow: auto; border: 1px solid var(--input-border); border-radius: 8px; padding: 8px; background: #f8fafc; }
     #user-dar-objeto-view .list-item-objeto { padding: 6px 10px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; }
@@ -395,7 +432,7 @@
     #user-dar-panes-view .list-item-pan { padding: 8px 10px; font-size: 0.9rem; border-radius: 4px; cursor: pointer; }
     #user-dar-panes-view .list-item-pan:hover { background: #e2e8f0; }
     #user-dar-panes-view .list-item-pan.selected { background: #fef3c7; border: 1px solid #f59e0b; }
-    @media (max-width: 640px) { #user-dar-objeto-view .dar-layout { grid-template-columns: 1fr; } #user-dar-panes-view .dar-panes-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) { #user-dar-panes-view .dar-panes-layout { grid-template-columns: 1fr; } }
 
     #admin-login-view, #admin-panel-view { display: none; flex-direction: column; padding: 20px 0; }
     #admin-login-view.visible, #admin-panel-view.visible { display: flex; }
@@ -755,8 +792,18 @@
 
       <div id="user-dar-objeto-view">
         <p class="back-link"><a href="#dashboard">&larr; Volver al dashboard</a></p>
+        <p class="dar-builds-link"><a href="https://retro.dofusbook.net/es/equipement/search" target="_blank" rel="noopener noreferrer">Buscador de builds</a></p>
         <p class="form-title" id="user-dar-titulo">Dar objeto a personaje</p>
         <div class="dar-layout">
+          <div class="dar-ids-bar">
+            <label for="user-dar-ids">IDs de objetos (separados por coma)</label>
+            <textarea id="user-dar-ids" class="input-ids" placeholder="Ej: 6248, 6249, 6250"></textarea>
+            <div class="submit-wrap" style="margin-top: 8px;">
+              <button type="button" class="btn-submit" id="user-dar-btn">Dar objetos</button>
+            </div>
+            <div class="global-error" id="user-dar-error"></div>
+            <p id="user-dar-ok" style="display:none; color: var(--valid); font-size: 0.9rem; margin-top: 8px;"></p>
+          </div>
           <div class="dar-left">
             <p class="form-title" style="margin-bottom: 8px;">Buscar objeto</p>
             <div class="filtro-objetos-stack">
@@ -770,14 +817,14 @@
             </div>
             <div class="list-wrap-objetos" id="list-objetos-user"></div>
           </div>
-          <div class="dar-right">
-            <label for="user-dar-ids" style="font-size: 0.75rem; font-weight: 600; color: #475569;">IDs de objetos (separados por coma)</label>
-            <textarea id="user-dar-ids" class="input-ids" placeholder="Ej: 6248, 6249, 6250"></textarea>
-            <div class="submit-wrap" style="margin-top: 12px;">
-              <button type="button" class="btn-submit" id="user-dar-btn">Dar objetos</button>
+          <div class="dar-detail-wrap">
+            <div class="dar-detail" id="user-dar-objeto-detail">
+              <p class="objeto-detail-placeholder">Haz clic en un objeto de la lista para ver su detalle.</p>
+              <div class="objeto-detail-content">
+                <div id="user-detail-fields" class="objeto-detail-fields"></div>
+                <button type="button" class="btn-anadir-objeto" id="user-dar-objeto-anadir">Añadir</button>
+              </div>
             </div>
-            <div class="global-error" id="user-dar-error"></div>
-            <p id="user-dar-ok" style="display:none; color: var(--valid); font-size: 0.9rem; margin-top: 8px;"></p>
           </div>
         </div>
       </div>
@@ -1026,6 +1073,8 @@
     }
     if (userDashboardView) { userDashboardView.classList.remove('visible'); if (which === 'user-dashboard') userDashboardView.classList.add('visible'); }
     if (userDarObjetoView) { userDarObjetoView.classList.remove('visible'); if (which === 'user-dar-objeto') userDarObjetoView.classList.add('visible'); }
+    var containerEl = document.querySelector('.container');
+    if (containerEl) { if (which === 'user-dar-objeto') containerEl.classList.add('hide-panel-left'); else containerEl.classList.remove('hide-panel-left'); }
     if (userDarPanesView) { userDarPanesView.classList.remove('visible'); if (which === 'user-dar-panes') userDarPanesView.classList.add('visible'); }
     if (userInventarioView) { userInventarioView.classList.remove('visible'); if (which === 'user-inventario') userInventarioView.classList.add('visible'); }
     if (adminInventarioView) { adminInventarioView.classList.remove('visible'); if (which === 'admin-inventario') adminInventarioView.classList.add('visible'); }
@@ -1220,6 +1269,10 @@
     if (nivelMinEl) nivelMinEl.value = '';
     if (nivelMaxEl) nivelMaxEl.value = '';
     document.getElementById('list-objetos-user').innerHTML = 'Haz clic en la lupa para buscar (nombre y/o nivel mín./máx.).';
+    var detailPanel = document.getElementById('user-dar-objeto-detail');
+    var fieldsEl = document.getElementById('user-detail-fields');
+    if (detailPanel) { detailPanel.classList.remove('objeto-selected'); detailPanel.removeAttribute('data-selected-id'); }
+    if (fieldsEl) fieldsEl.innerHTML = '';
   }
 
   var userDarPanesPersonajeId = null;
@@ -1382,16 +1435,135 @@
           listEl.innerHTML = list.length ? list.map(function (o) {
             var niv = (o.nivel != null && o.nivel !== '') ? o.nivel : 0;
             var nom = o.nombre != null ? String(o.nombre) : '';
-            return '<div class="list-item-objeto" data-id="' + o.id + '" data-nombre="' + nom.replace(/"/g, '&quot;') + '">' + o.id + ' &ndash; ' + (nom || '-') + ' <span class="obj-nivel">(nivel ' + niv + ')</span></div>';
+            return '<div class="list-item-objeto" data-id="' + o.id + '" data-nombre="' + nom.replace(/"/g, '&quot;') + '" data-nivel="' + niv + '">' + o.id + ' &ndash; ' + (nom || '-') + ' <span class="obj-nivel">(nivel ' + niv + ')</span></div>';
           }).join('') : 'Haz clic en la lupa para buscar (nombre y/o nivel mín./máx.).';
           listEl.querySelectorAll('.list-item-objeto').forEach(function (el) {
             el.addEventListener('click', function () {
               var id = el.getAttribute('data-id');
-              var idsEl = document.getElementById('user-dar-ids');
-              var actual = (idsEl.value || '').trim();
-              var ids = actual ? actual.split(/[,\s|]+/).map(function (s) { return s.trim(); }).filter(Boolean) : [];
-              if (ids.indexOf(id) === -1) ids.push(id);
-              idsEl.value = ids.join(', ');
+              listEl.querySelectorAll('.list-item-objeto').forEach(function (e) { e.classList.remove('selected'); });
+              el.classList.add('selected');
+              var detailPanel = document.getElementById('user-dar-objeto-detail');
+              var fieldsEl = document.getElementById('user-detail-fields');
+              if (!detailPanel || !fieldsEl) return;
+              detailPanel.classList.add('objeto-selected');
+              detailPanel.setAttribute('data-selected-id', id);
+              fieldsEl.innerHTML = '<p class="objeto-detail-msg">Cargando...</p>';
+              fetch('/api/user/objeto-detalle?id=' + encodeURIComponent(id), { headers: getUserHeaders(), cache: 'no-store' })
+                .then(function (r) { return r.json(); })
+                .then(function (result) {
+                  if (!result.success || !result.data) {
+                    fieldsEl.innerHTML = '<p class="objeto-detail-msg" style="color:var(--error);">No se pudo cargar el detalle.</p>';
+                    return;
+                  }
+                  var data = result.data;
+                  function getData(data, key) {
+                    if (!data || typeof data !== 'object') return undefined;
+                    var k = key.toLowerCase().replace(/_/g, '');
+                    for (var p in data) if (Object.prototype.hasOwnProperty.call(data, p) && p.toLowerCase().replace(/_/g, '') === k) return data[p];
+                    return data[key];
+                  }
+                  var statNames = { 77: 'Roba PM', 78: 'PM (2)', 81: 'Curar (2)', 84: 'Roba PA', 91: 'Robar vida Agua', 92: 'Robar vida Tierra', 93: 'Robar vida Aire', 94: 'Robar vida Fuego', 95: 'Robar vida Neutral', 96: 'Da\u00f1os Agua', 97: 'Da\u00f1os Tierra', 98: 'Da\u00f1os Aire', 99: 'Da\u00f1os', 100: 'Da\u00f1os', 101: 'Menos PA', 105: 'Da\u00f1os reducidos (no Feca)', 106: 'Reenv\u00edo hechizo', 107: 'Da\u00f1os devueltos', 108: 'Curar', 110: 'Vitalidad (vida)', 111: 'PA', 112: 'Da\u00f1os', 114: '% Da\u00f1os (mult)', 115: 'Golpes cr\u00edticos', 116: 'Menos alcance', 117: 'Alcance', 118: 'Fuerza', 119: 'Agilidad', 120: 'PA (2)', 121: 'Da\u00f1os (2)', 122: 'Fallos cr\u00edticos', 123: 'Suerte', 124: 'Sabidur\u00eda', 125: 'Vitalidad', 126: 'Inteligencia', 127: 'Menos PM', 128: 'PM', 138: '% Da\u00f1os', 142: 'Da\u00f1o f\u00edsico', 145: 'Menos da\u00f1os', 152: 'Menos Suerte', 153: 'Menos Vitalidad', 154: 'Menos Agilidad', 155: 'Menos Inteligencia', 156: 'Menos Sabidur\u00eda', 157: 'Menos Fuerza', 158: 'Pods', 159: 'Menos Pods', 160: 'Esquiva perd. PA', 161: 'Esquiva perd. PM', 162: 'Menos esquiva perd. PA', 163: 'Menos esquiva perd. PM', 164: 'Menos da\u00f1os reducidos', 165: 'Dominio', 168: 'Menos PA fijo', 169: 'Menos PM fijo', 171: 'Menos golpes cr\u00edticos', 174: 'Iniciativa', 175: 'Menos Iniciativa', 176: 'Prospecci\u00f3n', 177: 'Menos Prospecci\u00f3n', 178: 'Curas', 179: 'Menos Curas', 182: 'Criaturas invocadas', 183: 'Reducci\u00f3n m\u00e1gica', 184: 'Reducci\u00f3n f\u00edsica', 186: 'Menos % da\u00f1os', 194: 'Ganar kamas', 210: 'Res. % Tierra', 211: 'Res. % Agua', 212: 'Res. % Aire', 213: 'Res. % Fuego', 214: 'Res. % Neutral', 215: 'Menos res. % Tierra', 216: 'Menos res. % Agua', 217: 'Menos res. % Aire', 218: 'Menos res. % Fuego', 219: 'Menos res. % Neutral', 220: 'Reenv\u00edo da\u00f1os', 225: 'Da\u00f1os trampa', 226: '% Da\u00f1os trampa', 240: 'Res. fija Tierra', 241: 'Res. fija Agua', 242: 'Res. fija Aire', 243: 'Res. fija Fuego', 244: 'Res. fija Neutral', 245: 'Menos res. fija Tierra', 246: 'Menos res. fija Agua', 247: 'Menos res. fija Aire', 248: 'Menos res. fija Fuego', 249: 'Menos res. fija Neutral', 250: 'Res. % PvP Tierra', 251: 'Res. % PvP Agua', 252: 'Res. % PvP Aire', 253: 'Res. % PvP Fuego', 254: 'Res. % PvP Neutral', 255: 'Menos res. % PvP Tierra', 256: 'Menos res. % PvP Agua', 257: 'Menos res. % PvP Aire', 258: 'Menos res. % PvP Fuego', 259: 'Menos res. % PvP Neutral', 260: 'Res. fija PvP Tierra', 261: 'Res. fija PvP Agua', 262: 'Res. fija PvP Aire', 263: 'Res. fija PvP Fuego', 264: 'Res. fija PvP Neutral', 265: 'Da\u00f1os reducidos armaduras Feca', 281: 'Alcance hechizo clase', 282: 'Alcance modificable hechizo', 283: 'Da\u00f1os hechizo clase', 284: 'Curas hechizo clase', 285: 'Coste PA hechizo clase', 286: 'Turnos relanzar hechizo', 287: 'Cr\u00edticos hechizo clase', 288: 'Sin l\u00ednea recta hechizo', 289: 'Sin l\u00ednea vuelo hechizo', 290: 'Lanzamientos por turno', 291: 'Lanzamientos por objetivo', 292: 'Turnos relanzar fijo', 320: 'Roba alcance', 410: 'Huida', 411: 'Menos Huida', 413: 'Placaje', 414: 'Menos Placaje', 415: 'Da\u00f1os Agua', 416: 'Da\u00f1os Tierra', 417: 'Da\u00f1os Aire', 418: 'Da\u00f1os Fuego', 419: 'Da\u00f1os Neutral', 420: 'Quita efectos hechizo', 421: 'Retroceder casillas', 422: '% escudo PDV', 423: 'Avanzar casillas', 424: 'Menos % PDV temporal', 425: 'Da\u00f1os empuje', 426: 'Velocidad', 427: 'Detonar bomba', 428: 'Invocar bomba', 429: 'Da\u00f1os cr\u00edticos', 430: 'Reducci\u00f3n cr\u00edticos', 431: 'Retiro PA', 432: 'Retiro PM', 433: 'Menos retiro PA', 434: 'Menos retiro PM', 435: 'Reducci\u00f3n empuje', 436: 'Menos da\u00f1os Agua', 437: 'Menos da\u00f1os Tierra', 438: 'Menos da\u00f1os Aire', 439: 'Menos da\u00f1os Fuego', 440: 'Menos da\u00f1os Neutral', 441: 'Menos da\u00f1os cr\u00edticos', 442: 'Menos reducci\u00f3n cr\u00edticos', 443: 'Menos da\u00f1os empuje', 444: 'Menos reducci\u00f3n empuje', 910: '% Experiencia' };
+                  var elemSufijo = { 99: ' (fuego)', 100: ' (neutral)', 415: ' (agua)', 416: ' (tierra)', 417: ' (aire)', 418: ' (fuego)', 419: ' (neutral)' };
+                  var damageStatIds = { 99: 1, 100: 1, 112: 1, 121: 1, 142: 1, 415: 1, 416: 1, 417: 1, 418: 1, 419: 1, 425: 1, 429: 1 };
+                  function itemIconUrl(gfx) {
+                    if (gfx == null || gfx === '' || Number(gfx) <= 0) return '';
+                    var n = parseInt(gfx, 10);
+                    var sub = n < 10 ? n : Math.floor(n / 10);
+                    return '/api/user/items/' + sub + '/' + n + '.png';
+                  }
+                  var noImgUrl = '/api/user/items/noimg.jpg';
+                  function parseStatsModelo(str) {
+                    if (!str || typeof str !== 'string') return [];
+                    var out = [];
+                    str.split(',').forEach(function (s) {
+                      s = s.trim();
+                      if (!s) return;
+                      var parts = s.split('#');
+                      if (parts.length < 5) return;
+                      var statId = parseInt(parts[0], 16);
+                      var min = parseInt(parts[1], 16) || 0;
+                      var max = parseInt(parts[2], 16) || 0;
+                      if (max <= 0) max = min;
+                      var dice = parts[4] || '';
+                      var name = statNames[statId] || ('Stat ' + statId);
+                      var suf = elemSufijo[statId] || '';
+                      var prep = (name.indexOf('cr\u00edticos') >= 0 || name.indexOf('Da\u00f1os') >= 0) ? ' a los ' : (name === 'Alcance' ? ' al ' : ' a la ');
+                      var isDamage = damageStatIds[statId];
+                      if (isDamage && dice.match(/^\d+d\d+(\+\d+)?$/i)) {
+                        out.push({ text: 'Da\u00f1os: ' + min + ' a ' + max + suf });
+                      } else {
+                        if (min === max) out.push({ text: '+' + min + prep + name.toLowerCase() });
+                        else out.push({ text: '+' + min + ' a ' + max + prep + name.toLowerCase() });
+                      }
+                    });
+                    return out;
+                  }
+                  function parseCondicion(str) {
+                    if (!str || typeof str !== 'string') return [];
+                    var map = { CS: 'Fuerza', CI: 'Inteligencia', CV: 'Vitalidad', CA: 'Agilidad', CC: 'Suerte' };
+                    var out = [];
+                    str.split(/[&|]/).forEach(function (s) {
+                      s = s.trim();
+                      var m = s.match(/^([A-Za-z]+)\s*([<>=]+)\s*(\d+)$/);
+                      if (m) out.push((map[m[1]] || m[1]) + ' ' + m[2] + ' ' + m[3]);
+                    });
+                    return out.length ? out : (str ? [str] : []);
+                  }
+                  function parseInfosArma(str) {
+                    if (!str || typeof str !== 'string') return {};
+                    var parts = str.split(',');
+                    return {
+                      pa: parts[1] != null ? parseInt(parts[1], 10) : null,
+                      minAlc: parts[2] != null ? parseInt(parts[2], 10) : null,
+                      maxAlc: parts[3] != null ? parseInt(parts[3], 10) : null,
+                      bonusGC: parts[0] != null ? parseInt(parts[0], 10) : null,
+                      probGC: parts[4] != null ? parseInt(parts[4], 10) : null,
+                      porcFC: parts[5] != null ? parseInt(parts[5], 10) : null
+                    };
+                  }
+                  var gfxNum = (function () { var v = getData(data, 'gfx'); return (v != null && v !== '') ? parseInt(v, 10) : 0; })();
+                  var objId = (function () { var v = getData(data, 'id'); return (v != null && v !== '') ? parseInt(v, 10) : 0; })();
+                  var iconNum = gfxNum > 0 ? gfxNum : objId;
+                  // Por ahora todos usan noimg.jpg. Para usar PNGs en /items: iconUrlPng = iconNum > 0 ? itemIconUrl(iconNum) : noImgUrl;
+                  var iconUrlPng = noImgUrl;
+                  var statsModeloRaw = getData(data, 'statsModelo');
+                  var condicionRaw = getData(data, 'condicion');
+                  var infosArmaRaw = getData(data, 'infosArma');
+                  var efectos = parseStatsModelo((statsModeloRaw != null && statsModeloRaw !== '') ? String(statsModeloRaw) : '');
+                  var condiciones = parseCondicion((condicionRaw != null && condicionRaw !== '') ? String(condicionRaw) : '');
+                  var arma = parseInfosArma((infosArmaRaw != null && infosArmaRaw !== '') ? String(infosArmaRaw) : '');
+                  var nombre = (getData(data, 'nombre') || '').toString().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                  var podsVal = getData(data, 'pods');
+                  var nivelVal = getData(data, 'nivel');
+                  var pods = (podsVal != null && podsVal !== '') ? parseInt(podsVal, 10) : '';
+                  var nivel = (nivelVal != null && nivelVal !== '') ? parseInt(nivelVal, 10) : '';
+                  var setLabel = (function () { var v = getData(data, 'setID'); return (v != null && v !== '' && v !== 0) ? ('Set ' + v) : '—'; })();
+                  var html = '<div class="objeto-detail-header"><h3 class="objeto-detail-title">' + nombre + '</h3><span class="objeto-detail-meta">Pods: ' + pods + ' — Niv.' + nivel + '</span></div>';
+                  html += '<div class="objeto-detail-body">';
+                  html += '<div class="objeto-detail-col-image">';
+                  html += '<img src="' + iconUrlPng + '" alt="" class="objeto-detail-img" data-icon-num="' + iconNum + '" data-noimg="' + noImgUrl.replace(/"/g, '&quot;') + '" onerror="var i=this,n=i.getAttribute(\'data-icon-num\'); if(n&&i.dataset.tried1!==\'1\'){ i.dataset.tried1=1; i.src=\'/api/user/items/1/\'+n+\'.png\'; } else { i.onerror=null; i.src=i.getAttribute(\'data-noimg\')||\'' + noImgUrl.replace(/'/g, "\\'") + '\'; }">';
+                  html += '<span class="objeto-detail-set">' + setLabel + '</span></div>';
+                  html += '<div class="objeto-detail-table">';
+                  html += '<div class="objeto-detail-th">Efectos</div><div class="objeto-detail-th">Condiciones</div><div class="objeto-detail-th">Caracter\u00edsticas</div>';
+                  html += '<div class="objeto-detail-td"><ul class="cell-list">';
+                  efectos.forEach(function (e) { html += '<li>' + e.text.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</li>'; });
+                  if (!efectos.length) html += '<li>—</li>';
+                  html += '</ul></div><div class="objeto-detail-td"><ul class="cell-list">';
+                  condiciones.forEach(function (c) { html += '<li>' + c.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</li>'; });
+                  if (!condiciones.length) html += '<li>—</li>';
+                  html += '</ul></div><div class="objeto-detail-td"><ul class="cell-list">';
+                  if (arma.pa != null) html += '<li>PA: ' + arma.pa + '</li>';
+                  if (arma.minAlc != null && arma.maxAlc != null) html += '<li>Alcance: ' + arma.minAlc + ' a ' + arma.maxAlc + '</li>';
+                  if (arma.bonusGC != null) html += '<li>Bonificaci\u00f3n golpes cr\u00edticos: +' + arma.bonusGC + '</li>';
+                  if (arma.probGC != null) html += '<li>Cr\u00edtico: 1/' + arma.probGC + '</li>';
+                  if (arma.porcFC != null) html += '<li>Fracaso: 1/' + arma.porcFC + '</li>';
+                  if (arma.pa == null && arma.minAlc == null && arma.bonusGC == null && arma.probGC == null && arma.porcFC == null) html += '<li>—</li>';
+                  html += '</ul></div></div></div>';
+                  fieldsEl.innerHTML = html || '<p class="objeto-detail-msg">Sin datos.</p>';
+                })
+                .catch(function () {
+                  fieldsEl.innerHTML = '<p class="objeto-detail-msg" style="color:var(--error);">Error de conexión.</p>';
+                });
             });
           });
         } catch (err) {
@@ -1405,6 +1577,17 @@
       });
   }
   document.getElementById('user-buscar-objetos-btn') && document.getElementById('user-buscar-objetos-btn').addEventListener('click', function () { loadUserObjetos(); });
+
+  document.getElementById('user-dar-objeto-anadir') && document.getElementById('user-dar-objeto-anadir').addEventListener('click', function () {
+    var detailPanel = document.getElementById('user-dar-objeto-detail');
+    var id = detailPanel && detailPanel.getAttribute('data-selected-id');
+    var idsEl = document.getElementById('user-dar-ids');
+    if (!id || !idsEl) return;
+    var actual = (idsEl.value || '').trim();
+    var ids = actual ? actual.split(/[,\s|]+/).map(function (s) { return s.trim(); }).filter(Boolean) : [];
+    if (ids.indexOf(id) === -1) ids.push(id);
+    idsEl.value = ids.join(', ');
+  });
 
   document.getElementById('user-dar-btn') && document.getElementById('user-dar-btn').addEventListener('click', function () {
     var idsEl = document.getElementById('user-dar-ids');

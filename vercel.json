@@ -7,6 +7,7 @@
   "functions": {
     "api/registro.js": { "maxDuration": 10 },
     "api/serve-image.js": { "maxDuration": 5 },
+    "api/serve-favicon.js": { "maxDuration": 5 },
     "api/health.js": { "maxDuration": 5 },
     "api/handler.js": { "maxDuration": 15 }
   }

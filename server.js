@@ -25,11 +25,26 @@ try {
   };
 }
 
+const fs = require('fs');
 const app = express();
 const DIST = __dirname;
 
 app.use(express.json());
 app.use(express.static(DIST));
+// Iconos de objetos (copiados del cliente): /api/user/items/<gfx>.swf
+app.use('/api/user/items', express.static(path.join(DIST, 'api', 'user', 'items'), { maxAge: '1d' }));
+
+app.get('/api/serve-favicon', (req, res) => {
+  try {
+    const faviconPath = path.join(DIST, 'favicon.ico');
+    const buffer = fs.readFileSync(faviconPath);
+    res.setHeader('Content-Type', 'image/x-icon');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.status(200).send(buffer);
+  } catch (err) {
+    res.status(404).end();
+  }
+});
 
 app.post('/api/registro', async (req, res) => {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -237,6 +252,49 @@ app.get('/api/user/objetos', async (req, res) => {
   } catch (err) {
     console.error('User objetos:', err.message);
     res.status(500).json({ success: false, message: 'Error al buscar objetos.' });
+  } finally {
+    if (conn) conn.end();
+  }
+});
+
+// Detalle de un objeto por ID (todas las columnas de objetos_modelo)
+app.get('/api/user/objeto-detalle', async (req, res) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  const cuentaId = parseInt(req.headers['x-cuenta-id'] || req.query.cuentaId, 10);
+  if (!cuentaId || isNaN(cuentaId)) {
+    return res.status(401).json({ success: false, message: 'Sesión inválida.' });
+  }
+  const id = parseInt(req.query.id, 10);
+  if (!id || isNaN(id)) {
+    return res.status(400).json({ success: false, message: 'ID de objeto inválido.' });
+  }
+  const dbConfig = config.dbEstaticos || { ...config.db, database: 'bustar_estaticos' };
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    const [rows] = await conn.execute('SELECT * FROM objetos_modelo WHERE id = ? LIMIT 1', [id]);
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Objeto no encontrado.' });
+    }
+    const raw = rows[0];
+    function anyKey(obj, ...names) {
+      for (const n of names) if (obj[n] !== undefined) return obj[n]; return undefined;
+    }
+    const data = {
+      ...raw,
+      nombre: anyKey(raw, 'nombre', 'Nombre'),
+      nivel: anyKey(raw, 'nivel', 'Nivel'),
+      pods: anyKey(raw, 'pods', 'Pods'),
+      gfx: anyKey(raw, 'gfx', 'Gfx'),
+      condicion: anyKey(raw, 'condicion', 'Condicion'),
+      statsModelo: anyKey(raw, 'statsModelo', 'statsmodelo', 'stats_modelo'),
+      infosArma: anyKey(raw, 'infosArma', 'infosarma', 'infos_arma'),
+      setID: anyKey(raw, 'setID', 'setid', 'set_id'),
+    };
+    res.status(200).json({ success: true, data });
+  } catch (err) {
+    console.error('User objeto-detalle:', err.message);
+    res.status(500).json({ success: false, message: 'Error al cargar detalle.' });
   } finally {
     if (conn) conn.end();
   }
