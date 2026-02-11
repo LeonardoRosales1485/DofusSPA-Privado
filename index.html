@@ -817,11 +817,29 @@
   document.getElementById('link-admin') && document.getElementById('link-admin').addEventListener('click', function (e) {
     e.preventDefault();
     window.location.hash = 'admin-login';
+    applyRoute();
   });
   document.getElementById('link-login') && document.getElementById('link-login').addEventListener('click', function (e) {
     e.preventDefault();
     window.location.hash = 'login';
+    applyRoute();
   });
+
+  // Interceptar todos los enlaces con hash para forzar applyRoute (por si hashchange no se dispara, p. ej. en Vercel)
+  document.addEventListener('click', function (e) {
+    var target = e.target && (e.target.closest ? e.target.closest('a') : e.target);
+    if (!target || target.tagName !== 'A') return;
+    var href = target.getAttribute('href');
+    if (href && href.indexOf('#') === 0) {
+      e.preventDefault();
+      if (href === '#' && (target.textContent || '').indexOf('Cerrar sesión') !== -1) {
+        sessionStorage.removeItem(USER_CUENTA_ID);
+        sessionStorage.removeItem(USER_CUENTA);
+      }
+      window.location.hash = href === '#' ? '' : href.slice(1);
+      applyRoute();
+    }
+  }, true);
 
   function loadUserDashboard() {
     var listEl = document.getElementById('user-dashboard-personajes');
