@@ -16,6 +16,23 @@ try {
       password: process.env.DB_PASS || '',
       charset: 'utf8mb4',
     },
+    dbDinamicos: {
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT, 10) || 3306,
+      database: process.env.DB_DINAMICOS || 'bustar_dinamicos',
+      user: process.env.DB_USER || 'root',
+      password: process.env.DB_PASS || '',
+      charset: 'utf8mb4',
+    },
+    dbEstaticos: {
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT, 10) || 3306,
+      database: process.env.DB_ESTATICOS || 'bustar_estaticos',
+      user: process.env.DB_USER || 'root',
+      password: process.env.DB_PASS || '',
+      charset: 'utf8mb4',
+    },
+    adminPassword: process.env.ADMIN_PASSWORD || '210696Crows',
   };
 }
 
@@ -130,6 +147,95 @@ app.post('/api/registro', async (req, res) => {
       ? 'Error de base de datos. Revisa que la tabla cuentas exista y tenga las columnas esperadas.'
       : 'Error al registrar. Intenta de nuevo.';
     res.status(500).json({ success: false, message: msg });
+  } finally {
+    if (conn) conn.end();
+  }
+});
+
+// --- Panel admin (protegido por contraseña) ---
+const adminPassword = config.adminPassword || '210696Crows';
+
+function checkAdminPassword(req) {
+  const p = req.headers['x-admin-password'] || (req.body && req.body.password);
+  return p === adminPassword;
+}
+
+app.post('/api/admin/login', (req, res) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  const ok = checkAdminPassword(req);
+  res.status(200).json({ success: ok });
+});
+
+app.get('/api/admin/personajes', async (req, res) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  if (!checkAdminPassword(req)) {
+    return res.status(401).json({ success: false, message: 'No autorizado.' });
+  }
+  const dbConfig = config.dbDinamicos || { ...config.db, database: 'bustar_dinamicos' };
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    const [rows] = await conn.execute(
+      'SELECT id, nombre, nivel, clase, cuenta FROM personajes ORDER BY nombre ASC'
+    );
+    res.status(200).json({ success: true, data: rows });
+  } catch (err) {
+    console.error('Admin personajes:', err.message);
+    res.status(500).json({ success: false, message: 'Error al cargar personajes.' });
+  } finally {
+    if (conn) conn.end();
+  }
+});
+
+app.get('/api/admin/objetos', async (req, res) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  if (!checkAdminPassword(req)) {
+    return res.status(401).json({ success: false, message: 'No autorizado.' });
+  }
+  const dbConfig = config.dbEstaticos || { ...config.db, database: 'bustar_estaticos' };
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    const [rows] = await conn.execute(
+      'SELECT id, nombre FROM objetos_modelo ORDER BY id ASC'
+    );
+    res.status(200).json({ success: true, data: rows });
+  } catch (err) {
+    console.error('Admin objetos:', err.message);
+    res.status(500).json({ success: false, message: 'Error al cargar objetos.' });
+  } finally {
+    if (conn) conn.end();
+  }
+});
+
+app.post('/api/admin/dar-objetos', async (req, res) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  if (!checkAdminPassword(req)) {
+    return res.status(401).json({ success: false, message: 'No autorizado.' });
+  }
+  const personajeId = parseInt(req.body && req.body.personajeId, 10);
+  let objetoIds = (req.body && req.body.objetoIds) ? String(req.body.objetoIds).trim() : '';
+  if (!personajeId || isNaN(personajeId) || !objetoIds) {
+    return res.status(400).json({ success: false, message: 'Faltan personajeId u objetoIds.' });
+  }
+  // Aceptar "6248|6249" o "6248, 6249" o "6248 6249"
+  const ids = objetoIds.replace(/,/g, '|').split(/\|/).map(s => s.trim()).filter(Boolean);
+  const nuevoValor = ids.join('|');
+  const dbConfig = config.dbDinamicos || { ...config.db, database: 'bustar_dinamicos' };
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    const [[row]] = await conn.execute('SELECT objetos FROM personajes WHERE id = ?', [personajeId]);
+    if (!row) {
+      return res.status(404).json({ success: false, message: 'Personaje no encontrado.' });
+    }
+    const actual = (row.objetos || '').trim();
+    const concatenado = actual ? (actual + '|' + nuevoValor) : nuevoValor;
+    await conn.execute('UPDATE personajes SET objetos = ? WHERE id = ?', [concatenado, personajeId]);
+    res.status(200).json({ success: true, message: 'Objetos añadidos al inventario.' });
+  } catch (err) {
+    console.error('Admin dar-objetos:', err.message);
+    res.status(500).json({ success: false, message: 'Error al actualizar inventario.' });
   } finally {
     if (conn) conn.end();
   }

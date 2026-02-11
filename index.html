@@ -286,6 +286,32 @@
     .global-error.visible {
       display: block;
     }
+
+    .admin-link { margin-top: 16px; }
+    .admin-link a { color: var(--btn-primary); font-size: 0.9rem; text-decoration: none; }
+    .admin-link a:hover { text-decoration: underline; }
+
+    #admin-login-view, #admin-panel-view { display: none; flex-direction: column; padding: 20px 0; }
+    #admin-login-view.visible, #admin-panel-view.visible { display: flex; }
+    #admin-login-view .field { max-width: 320px; }
+    #admin-panel-view .admin-nav { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    #admin-panel-view .admin-nav button {
+      padding: 10px 16px; font-size: 0.9rem; font-weight: 600; border: 2px solid var(--btn-primary);
+      background: #fff; color: var(--btn-primary); border-radius: 8px; cursor: pointer; font-family: inherit;
+    }
+    #admin-panel-view .admin-nav button:hover { background: #f0fdf4; }
+    #admin-panel-view .admin-nav button.active { background: var(--btn-primary); color: #fff; }
+    #admin-panel-view .admin-section { display: none; }
+    #admin-panel-view .admin-section.visible { display: block; }
+    #admin-panel-view .filter-input { margin-bottom: 12px; max-width: 320px; padding: 8px 12px; font-size: 0.95rem; border: 2px solid var(--input-border); border-radius: 6px; }
+    #admin-panel-view .list-wrap { max-height: 360px; overflow: auto; border: 1px solid var(--input-border); border-radius: 8px; padding: 8px; background: #f8fafc; }
+    #admin-panel-view .list-item { padding: 6px 10px; font-size: 0.9rem; border-radius: 4px; }
+    #admin-panel-view .list-item:nth-child(even) { background: #f1f5f9; }
+    #admin-panel-view .dar-form .field { max-width: 360px; margin-bottom: 12px; }
+    #admin-panel-view .dar-form .btn-submit { margin-top: 12px; }
+    .back-link { font-size: 0.85rem; margin-bottom: 16px; }
+    .back-link a { color: #64748b; text-decoration: none; }
+    .back-link a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -299,6 +325,7 @@
     <div class="panel-right">
       <div id="form-view">
         <p class="form-title">Registro de cuenta</p>
+        <p class="admin-link"><a href="#admin-login" id="link-admin">Acceso admin</a></p>
         <div class="global-error" id="global-error" role="alert"></div>
         <form id="registro-form" novalidate method="post" action="javascript:void(0);">
           <div class="form-columns">
@@ -398,6 +425,63 @@
       <div id="success-view">
         <h2>Registro exitoso</h2>
         <p>Tu cuenta ha sido creada. Ya puedes iniciar sesión en el juego.</p>
+      </div>
+
+      <div id="admin-login-view">
+        <p class="back-link"><a href="#">&larr; Volver</a></p>
+        <p class="form-title">Acceso admin</p>
+        <div class="global-error" id="admin-login-error" role="alert"></div>
+        <div class="field" style="max-width: 320px;">
+          <label for="admin-password">Contraseña</label>
+          <div class="field-wrap">
+            <input type="password" id="admin-password" placeholder="Contraseña de administrador" autocomplete="off">
+          </div>
+        </div>
+        <div class="submit-wrap" style="margin-top: 14px;">
+          <button type="button" class="btn-submit" id="admin-login-btn">Entrar</button>
+        </div>
+      </div>
+
+      <div id="admin-panel-view">
+        <p class="back-link"><a href="#">&larr; Volver al inicio</a></p>
+        <p class="form-title">Panel de administración</p>
+        <div class="admin-nav">
+          <button type="button" data-section="personajes">Ver personajes</button>
+          <button type="button" data-section="objetos">Buscar objetos</button>
+          <button type="button" data-section="dar">Dar objeto(s)</button>
+        </div>
+
+        <div id="admin-section-personajes" class="admin-section">
+          <input type="text" class="filter-input" id="filter-personajes" placeholder="Filtrar por nombre...">
+          <div class="list-wrap" id="list-personajes"></div>
+        </div>
+        <div id="admin-section-objetos" class="admin-section">
+          <input type="text" class="filter-input" id="filter-objetos" placeholder="Filtrar por nombre...">
+          <div class="list-wrap" id="list-objetos"></div>
+        </div>
+        <div id="admin-section-dar" class="admin-section">
+          <form class="dar-form" id="form-dar-objetos">
+            <div class="field">
+              <label for="dar-personaje">Personaje</label>
+              <div class="field-wrap">
+                <select id="dar-personaje" required>
+                  <option value="">Selecciona un personaje</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="dar-objeto-ids">IDs de objetos (separados por | o coma)</label>
+              <div class="field-wrap">
+                <input type="text" id="dar-objeto-ids" placeholder="Ej: 6248|6249|6250 o 6248, 6249" required>
+              </div>
+            </div>
+            <div class="submit-wrap">
+              <button type="submit" class="btn-submit">Dar objetos</button>
+            </div>
+          </form>
+          <div class="global-error" id="dar-objetos-error"></div>
+          <p id="dar-objetos-ok" style="display:none; color: var(--valid); font-size: 0.9rem; margin-top: 8px;"></p>
+        </div>
       </div>
     </div>
   </div>
@@ -524,6 +608,215 @@
     var input = getField(name);
     if (input) input.addEventListener('blur', function () { if (!formView.classList.contains('hidden')) runValidation(); });
   });
+})();
+  </script>
+  <script>
+(function () {
+  var ADMIN_STORAGE = 'admin_pass';
+  var formView = document.getElementById('form-view');
+  var successView = document.getElementById('success-view');
+  var adminLoginView = document.getElementById('admin-login-view');
+  var adminPanelView = document.getElementById('admin-panel-view');
+  var adminPasswordInput = document.getElementById('admin-password');
+  var adminLoginBtn = document.getElementById('admin-login-btn');
+  var adminLoginError = document.getElementById('admin-login-error');
+  var filterPersonajes = document.getElementById('filter-personajes');
+  var filterObjetos = document.getElementById('filter-objetos');
+  var listPersonajes = document.getElementById('list-personajes');
+  var listObjetos = document.getElementById('list-objetos');
+  var darPersonajeSelect = document.getElementById('dar-personaje');
+  var darObjetoIdsInput = document.getElementById('dar-objeto-ids');
+  var formDarObjetos = document.getElementById('form-dar-objetos');
+  var darObjetosError = document.getElementById('dar-objetos-error');
+  var darObjetosOk = document.getElementById('dar-objetos-ok');
+
+  function getAdminHeaders() {
+    var pass = sessionStorage.getItem(ADMIN_STORAGE);
+    return pass ? { 'X-Admin-Password': pass, 'Content-Type': 'application/json' } : {};
+  }
+
+  function showView(which) {
+    formView.classList.remove('hidden');
+    if (which !== 'form') formView.classList.add('hidden');
+    successView.classList.remove('visible');
+    if (which === 'success') successView.classList.add('visible');
+    adminLoginView.classList.remove('visible');
+    if (which === 'admin-login') adminLoginView.classList.add('visible');
+    adminPanelView.classList.remove('visible');
+    if (which === 'admin') adminPanelView.classList.add('visible');
+  }
+
+  function showAdminSection(sectionId) {
+    document.querySelectorAll('#admin-panel-view .admin-section').forEach(function (el) { el.classList.remove('visible'); });
+    document.querySelectorAll('#admin-panel-view .admin-nav button').forEach(function (el) { el.classList.remove('active'); });
+    var section = document.getElementById('admin-section-' + sectionId);
+    if (section) section.classList.add('visible');
+    var btn = document.querySelector('#admin-panel-view .admin-nav button[data-section="' + sectionId + '"]');
+    if (btn) btn.classList.add('active');
+    if (sectionId === 'personajes') loadPersonajes();
+    if (sectionId === 'objetos') loadObjetos();
+    if (sectionId === 'dar') fillDarPersonajes();
+  }
+
+  function applyRoute() {
+    var hash = (window.location.hash || '').replace('#', '');
+    if (hash === 'admin-login') {
+      showView('admin-login');
+      adminLoginError.textContent = '';
+      if (adminPasswordInput) adminPasswordInput.value = '';
+    } else if (hash === 'admin') {
+      if (!sessionStorage.getItem(ADMIN_STORAGE)) {
+        window.location.hash = '';
+        showView('form');
+        return;
+      }
+      showView('admin');
+      showAdminSection('personajes');
+    } else {
+      showView('form');
+    }
+  }
+
+  window.addEventListener('hashchange', applyRoute);
+  window.addEventListener('load', applyRoute);
+
+  document.querySelectorAll('a[href="#"]').forEach(function (a) {
+    a.addEventListener('click', function (e) { e.preventDefault(); window.location.hash = ''; });
+  });
+  document.getElementById('link-admin') && document.getElementById('link-admin').addEventListener('click', function (e) {
+    e.preventDefault();
+    window.location.hash = 'admin-login';
+  });
+
+  if (adminLoginBtn) {
+    adminLoginBtn.addEventListener('click', function () {
+      var pass = (adminPasswordInput && adminPasswordInput.value) || '';
+      adminLoginError.textContent = '';
+      if (!pass) { adminLoginError.textContent = 'Escribe la contraseña.'; adminLoginError.classList.add('visible'); return; }
+      fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pass }) })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.success) {
+            sessionStorage.setItem(ADMIN_STORAGE, pass);
+            window.location.hash = 'admin';
+          } else {
+            adminLoginError.textContent = 'Contraseña incorrecta.';
+            adminLoginError.classList.add('visible');
+            setTimeout(function () { window.location.hash = ''; }, 1500);
+          }
+        })
+        .catch(function () {
+          adminLoginError.textContent = 'Error de conexión.';
+          adminLoginError.classList.add('visible');
+        });
+    });
+  }
+
+  document.querySelectorAll('#admin-panel-view .admin-nav button').forEach(function (btn) {
+    btn.addEventListener('click', function () { showAdminSection(btn.getAttribute('data-section')); });
+  });
+
+  function loadPersonajes() {
+    listPersonajes.innerHTML = 'Cargando...';
+    fetch('/api/admin/personajes', { headers: getAdminHeaders() })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.success) { listPersonajes.innerHTML = 'No autorizado o error.'; return; }
+        window._adminPersonajes = data.data || [];
+        renderListPersonajes();
+      })
+      .catch(function () { listPersonajes.innerHTML = 'Error al cargar.'; });
+  }
+
+  function renderListPersonajes() {
+    var list = window._adminPersonajes || [];
+    var q = (filterPersonajes && filterPersonajes.value || '').toLowerCase().trim();
+    if (q) list = list.filter(function (p) { return (p.nombre || '').toLowerCase().indexOf(q) !== -1; });
+    listPersonajes.innerHTML = list.length ? list.map(function (p) {
+      return '<div class="list-item">ID ' + p.id + ' &ndash; ' + (p.nombre || '-') + ' (nivel ' + (p.nivel || 0) + ')</div>';
+    }).join('') : 'No hay personajes o no coinciden con el filtro.';
+  }
+  if (filterPersonajes) filterPersonajes.addEventListener('input', function () { renderListPersonajes(); });
+
+  function loadObjetos() {
+    listObjetos.innerHTML = 'Cargando...';
+    fetch('/api/admin/objetos', { headers: getAdminHeaders() })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.success) { listObjetos.innerHTML = 'No autorizado o error.'; return; }
+        window._adminObjetos = data.data || [];
+        renderListObjetos();
+      })
+      .catch(function () { listObjetos.innerHTML = 'Error al cargar.'; });
+  }
+
+  function renderListObjetos() {
+    var list = window._adminObjetos || [];
+    var q = (filterObjetos && filterObjetos.value || '').toLowerCase().trim();
+    if (q) list = list.filter(function (o) { return ((o.nombre || '') + ' ' + (o.id || '')).toLowerCase().indexOf(q) !== -1; });
+    listObjetos.innerHTML = list.length ? list.map(function (o) {
+      return '<div class="list-item">ID ' + o.id + ' &ndash; ' + (o.nombre || '-') + '</div>';
+    }).join('') : 'No hay objetos o no coinciden con el filtro.';
+  }
+  if (filterObjetos) filterObjetos.addEventListener('input', function () { renderListObjetos(); });
+
+  function fillDarPersonajes() {
+    darPersonajeSelect.innerHTML = '<option value="">Cargando...</option>';
+    fetch('/api/admin/personajes', { headers: getAdminHeaders() })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        darPersonajeSelect.innerHTML = '<option value="">Selecciona un personaje</option>';
+        (data.data || []).forEach(function (p) {
+          var opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = (p.nombre || '') + ' (ID ' + p.id + ')';
+          darPersonajeSelect.appendChild(opt);
+        });
+      })
+      .catch(function () { darPersonajeSelect.innerHTML = '<option value="">Error al cargar</option>'; });
+  }
+
+  if (formDarObjetos) {
+    formDarObjetos.addEventListener('submit', function (e) {
+      e.preventDefault();
+      darObjetosError.textContent = '';
+      darObjetosError.classList.remove('visible');
+      darObjetosOk.style.display = 'none';
+      var personajeId = darPersonajeSelect && darPersonajeSelect.value;
+      var objetoIds = (darObjetoIdsInput && darObjetoIdsInput.value || '').trim();
+      if (!personajeId || !objetoIds) {
+        darObjetosError.textContent = 'Selecciona personaje e indica IDs de objetos.';
+        darObjetosError.classList.add('visible');
+        return;
+      }
+      var headers = getAdminHeaders();
+      if (!headers['X-Admin-Password']) {
+        darObjetosError.textContent = 'Sesión admin expirada. Vuelve a entrar con la contraseña.';
+        darObjetosError.classList.add('visible');
+        return;
+      }
+      fetch('/api/admin/dar-objetos', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ personajeId: parseInt(personajeId, 10), objetoIds: objetoIds })
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.success) {
+            darObjetosOk.textContent = data.message || 'Objetos añadidos correctamente.';
+            darObjetosOk.style.display = 'block';
+            if (darObjetoIdsInput) darObjetoIdsInput.value = '';
+          } else {
+            darObjetosError.textContent = data.message || 'Error al dar objetos.';
+            darObjetosError.classList.add('visible');
+          }
+        })
+        .catch(function () {
+          darObjetosError.textContent = 'Error de conexión.';
+          darObjetosError.classList.add('visible');
+        });
+    });
+  }
 })();
   </script>
 </body>
