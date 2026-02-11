@@ -290,6 +290,29 @@
     .admin-link { margin-top: 16px; }
     .admin-link a { color: var(--btn-primary); font-size: 0.9rem; text-decoration: none; }
     .admin-link a:hover { text-decoration: underline; }
+    .top-links { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
+    .top-links a { color: var(--btn-primary); font-size: 0.9rem; text-decoration: none; }
+    .top-links a:hover { text-decoration: underline; }
+
+    #user-login-view, #user-dashboard-view, #user-dar-objeto-view { display: none; flex-direction: column; padding: 20px 0; min-height: 0; overflow: auto; }
+    #user-login-view.visible, #user-dashboard-view.visible, #user-dar-objeto-view.visible { display: flex; }
+    #user-login-view .field { max-width: 320px; }
+    #user-dashboard-view .personajes-list { max-height: 360px; overflow: auto; border: 1px solid var(--input-border); border-radius: 8px; padding: 8px; background: #f8fafc; }
+    #user-dashboard-view .personaje-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; font-size: 0.9rem; border-radius: 6px; margin-bottom: 6px; background: #fff; border: 1px solid var(--input-border); }
+    #user-dashboard-view .personaje-row:last-child { margin-bottom: 0; }
+    #user-dashboard-view .btn-dar { padding: 6px 14px; font-size: 0.85rem; font-weight: 600; background: var(--btn-primary); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; }
+    #user-dashboard-view .btn-dar:hover { background: var(--btn-hover); }
+    #user-dar-objeto-view .dar-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; min-height: 0; }
+    #user-dar-objeto-view .dar-left { display: flex; flex-direction: column; min-width: 0; }
+    #user-dar-objeto-view .dar-right { display: flex; flex-direction: column; }
+    #user-dar-objeto-view .busqueda-objetos { margin-bottom: 8px; padding: 8px 12px; font-size: 0.95rem; border: 2px solid var(--input-border); border-radius: 6px; }
+    #user-dar-objeto-view .list-wrap-objetos { max-height: 280px; overflow: auto; border: 1px solid var(--input-border); border-radius: 8px; padding: 8px; background: #f8fafc; }
+    #user-dar-objeto-view .list-item-objeto { padding: 6px 10px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; }
+    #user-dar-objeto-view .list-item-objeto:hover { background: #e2e8f0; }
+    #user-dar-objeto-view .list-item-objeto.selected { background: #dcfce7; color: var(--btn-primary); }
+    #user-dar-objeto-view .input-ids { margin-top: 8px; padding: 10px 12px; font-size: 0.95rem; border: 2px solid var(--input-border); border-radius: 6px; min-height: 80px; resize: vertical; font-family: inherit; }
+    #user-dar-objeto-view .input-ids:focus { border-color: var(--btn-primary); outline: none; }
+    @media (max-width: 640px) { #user-dar-objeto-view .dar-layout { grid-template-columns: 1fr; } }
 
     #admin-login-view, #admin-panel-view { display: none; flex-direction: column; padding: 20px 0; }
     #admin-login-view.visible, #admin-panel-view.visible { display: flex; }
@@ -325,7 +348,10 @@
     <div class="panel-right">
       <div id="form-view">
         <p class="form-title">Registro de cuenta</p>
-        <p class="admin-link"><a href="#admin-login" id="link-admin">Acceso admin</a></p>
+        <p class="top-links">
+          <a href="#login" id="link-login">Iniciar sesión</a>
+          <a href="#admin-login" id="link-admin">Acceso admin</a>
+        </p>
         <div class="global-error" id="global-error" role="alert"></div>
         <form id="registro-form" novalidate method="post" action="javascript:void(0);">
           <div class="form-columns">
@@ -483,6 +509,57 @@
           <p id="dar-objetos-ok" style="display:none; color: var(--valid); font-size: 0.9rem; margin-top: 8px;"></p>
         </div>
       </div>
+
+      <div id="user-login-view">
+        <p class="back-link"><a href="#">&larr; Volver</a></p>
+        <p class="form-title">Login</p>
+        <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 16px;">Inicia sesión con tu cuenta y contraseña del juego.</p>
+        <div class="global-error" id="user-login-error" role="alert"></div>
+        <div class="field" style="max-width: 320px;">
+          <label for="user-login-cuenta">Cuenta</label>
+          <div class="field-wrap">
+            <input type="text" id="user-login-cuenta" placeholder="Nombre de cuenta" autocomplete="username">
+          </div>
+        </div>
+        <div class="field" style="max-width: 320px; margin-top: 12px;">
+          <label for="user-login-contraseña">Contraseña</label>
+          <div class="field-wrap">
+            <input type="password" id="user-login-contraseña" placeholder="Contraseña" autocomplete="current-password">
+          </div>
+        </div>
+        <div class="submit-wrap" style="margin-top: 16px;">
+          <button type="button" class="btn-submit" id="user-login-btn">Entrar</button>
+        </div>
+      </div>
+
+      <div id="user-dashboard-view">
+        <p class="back-link"><a href="#">&larr; Cerrar sesión</a></p>
+        <p class="form-title">Mi dashboard</p>
+        <p id="user-dashboard-saludo" style="color: #64748b; font-size: 0.9rem; margin-bottom: 12px;"></p>
+        <p style="font-size: 0.75rem; font-weight: 600; color: #475569; margin-bottom: 8px;">TUS PERSONAJES</p>
+        <div class="personajes-list" id="user-dashboard-personajes"></div>
+      </div>
+
+      <div id="user-dar-objeto-view">
+        <p class="back-link"><a href="#dashboard">&larr; Volver al dashboard</a></p>
+        <p class="form-title" id="user-dar-titulo">Dar objeto a personaje</p>
+        <div class="dar-layout">
+          <div class="dar-left">
+            <label for="busqueda-objetos" style="font-size: 0.75rem; font-weight: 600; color: #475569;">Buscar objeto</label>
+            <input type="text" id="busqueda-objetos" class="busqueda-objetos" placeholder="Nombre o ID del objeto">
+            <div class="list-wrap-objetos" id="list-objetos-user"></div>
+          </div>
+          <div class="dar-right">
+            <label for="user-dar-ids" style="font-size: 0.75rem; font-weight: 600; color: #475569;">IDs de objetos (separados por coma)</label>
+            <textarea id="user-dar-ids" class="input-ids" placeholder="Ej: 6248, 6249, 6250"></textarea>
+            <div class="submit-wrap" style="margin-top: 12px;">
+              <button type="button" class="btn-submit" id="user-dar-btn">Dar objetos</button>
+            </div>
+            <div class="global-error" id="user-dar-error"></div>
+            <p id="user-dar-ok" style="display:none; color: var(--valid); font-size: 0.9rem; margin-top: 8px;"></p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <script>
@@ -613,10 +690,15 @@
   <script>
 (function () {
   var ADMIN_STORAGE = 'admin_pass';
+  var USER_CUENTA_ID = 'userCuentaId';
+  var USER_CUENTA = 'userCuenta';
   var formView = document.getElementById('form-view');
   var successView = document.getElementById('success-view');
   var adminLoginView = document.getElementById('admin-login-view');
   var adminPanelView = document.getElementById('admin-panel-view');
+  var userLoginView = document.getElementById('user-login-view');
+  var userDashboardView = document.getElementById('user-dashboard-view');
+  var userDarObjetoView = document.getElementById('user-dar-objeto-view');
   var adminPasswordInput = document.getElementById('admin-password');
   var adminLoginBtn = document.getElementById('admin-login-btn');
   var adminLoginError = document.getElementById('admin-login-error');
@@ -635,6 +717,11 @@
     return pass ? { 'X-Admin-Password': pass, 'Content-Type': 'application/json' } : {};
   }
 
+  function getUserHeaders() {
+    var cuentaId = sessionStorage.getItem(USER_CUENTA_ID);
+    return cuentaId ? { 'X-Cuenta-Id': cuentaId, 'Content-Type': 'application/json' } : {};
+  }
+
   function showView(which) {
     formView.classList.remove('hidden');
     if (which !== 'form') formView.classList.add('hidden');
@@ -644,6 +731,12 @@
     if (which === 'admin-login') adminLoginView.classList.add('visible');
     adminPanelView.classList.remove('visible');
     if (which === 'admin') adminPanelView.classList.add('visible');
+    userLoginView.classList.remove('visible');
+    if (which === 'user-login') userLoginView.classList.add('visible');
+    userDashboardView.classList.remove('visible');
+    if (which === 'user-dashboard') userDashboardView.classList.add('visible');
+    userDarObjetoView.classList.remove('visible');
+    if (which === 'user-dar-objeto') userDarObjetoView.classList.add('visible');
   }
 
   function showAdminSection(sectionId) {
@@ -660,11 +753,19 @@
 
   function applyRoute() {
     var hash = (window.location.hash || '').replace('#', '');
-    if (hash === 'admin-login') {
+    var base = hash.split('?')[0];
+    var params = {};
+    if (hash.indexOf('?') !== -1) {
+      hash.split('?')[1].split('&').forEach(function (p) {
+        var kv = p.split('=');
+        if (kv[0]) params[kv[0]] = decodeURIComponent((kv[1] || '').replace(/\+/g, ' '));
+      });
+    }
+    if (base === 'admin-login') {
       showView('admin-login');
       adminLoginError.textContent = '';
       if (adminPasswordInput) adminPasswordInput.value = '';
-    } else if (hash === 'admin') {
+    } else if (base === 'admin') {
       if (!sessionStorage.getItem(ADMIN_STORAGE)) {
         window.location.hash = '';
         showView('form');
@@ -672,6 +773,26 @@
       }
       showView('admin');
       showAdminSection('personajes');
+    } else if (base === 'login') {
+      showView('user-login');
+      var errEl = document.getElementById('user-login-error');
+      if (errEl) { errEl.textContent = ''; errEl.classList.remove('visible'); }
+    } else if (base === 'dashboard') {
+      if (!sessionStorage.getItem(USER_CUENTA_ID)) {
+        window.location.hash = 'login';
+        showView('user-login');
+        return;
+      }
+      showView('user-dashboard');
+      loadUserDashboard();
+    } else if (base === 'dar-objeto' && params.id) {
+      if (!sessionStorage.getItem(USER_CUENTA_ID)) {
+        window.location.hash = 'login';
+        showView('user-login');
+        return;
+      }
+      showView('user-dar-objeto');
+      initUserDarObjeto(parseInt(params.id, 10));
     } else {
       showView('form');
     }
@@ -681,12 +802,179 @@
   window.addEventListener('load', applyRoute);
 
   document.querySelectorAll('a[href="#"]').forEach(function (a) {
-    a.addEventListener('click', function (e) { e.preventDefault(); window.location.hash = ''; });
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (userDashboardView.classList.contains('visible') && a.textContent.indexOf('Cerrar sesión') !== -1) {
+        sessionStorage.removeItem(USER_CUENTA_ID);
+        sessionStorage.removeItem(USER_CUENTA);
+        window.location.hash = '';
+      } else {
+        window.location.hash = '';
+      }
+      showView('form');
+    });
   });
   document.getElementById('link-admin') && document.getElementById('link-admin').addEventListener('click', function (e) {
     e.preventDefault();
     window.location.hash = 'admin-login';
   });
+  document.getElementById('link-login') && document.getElementById('link-login').addEventListener('click', function (e) {
+    e.preventDefault();
+    window.location.hash = 'login';
+  });
+
+  function loadUserDashboard() {
+    var listEl = document.getElementById('user-dashboard-personajes');
+    var saludoEl = document.getElementById('user-dashboard-saludo');
+    var cuenta = sessionStorage.getItem(USER_CUENTA) || '';
+    if (saludoEl) saludoEl.textContent = 'Hola, ' + (cuenta || 'Usuario') + '. Estos son tus personajes:';
+    listEl.innerHTML = 'Cargando...';
+    fetch('/api/user/personajes', { headers: getUserHeaders() })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.success) {
+          listEl.innerHTML = 'Sesi\u00f3n inv\u00e1lida. <a href="#login">Inicia sesi\u00f3n</a>.';
+          return;
+        }
+        var list = data.data || [];
+        if (list.length === 0) {
+          listEl.innerHTML = 'No tienes personajes en esta cuenta.';
+          return;
+        }
+        listEl.innerHTML = list.map(function (p) {
+          return '<div class="personaje-row"><span><strong>' + (p.nombre || '-') + '</strong> (nivel ' + (p.nivel || 0) + ')</span><a href="#dar-objeto?id=' + p.id + '" class="btn-dar">Dar objeto</a></div>';
+        }).join('');
+      })
+      .catch(function () { listEl.innerHTML = 'Error al cargar personajes.'; });
+  }
+
+  var userDarPersonajeId = null;
+  var userDarPersonajeNombre = '';
+
+  function initUserDarObjeto(personajeId) {
+    userDarPersonajeId = personajeId;
+    userDarPersonajeNombre = '';
+    var titulo = document.getElementById('user-dar-titulo');
+    titulo.textContent = 'Dar objeto al personaje (ID ' + personajeId + ')';
+    document.getElementById('user-dar-ids').value = '';
+    document.getElementById('user-dar-error').textContent = '';
+    document.getElementById('user-dar-error').classList.remove('visible');
+    document.getElementById('user-dar-ok').style.display = 'none';
+    document.getElementById('busqueda-objetos').value = '';
+    loadUserObjetos('');
+  }
+
+  function loadUserObjetos(q) {
+    var listEl = document.getElementById('list-objetos-user');
+    listEl.innerHTML = 'Cargando...';
+    var url = '/api/user/objetos';
+    if (q) url += '?q=' + encodeURIComponent(q);
+    fetch(url, { headers: getUserHeaders() })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.success) {
+          listEl.innerHTML = 'No autorizado o error.';
+          return;
+        }
+        var list = data.data || [];
+        listEl.innerHTML = list.length ? list.map(function (o) {
+          return '<div class="list-item-objeto" data-id="' + o.id + '" data-nombre="' + (o.nombre || '').replace(/"/g, '&quot;') + '">' + o.id + ' &ndash; ' + (o.nombre || '-') + '</div>';
+        }).join('') : 'Escribe en el buscador para filtrar.';
+        listEl.querySelectorAll('.list-item-objeto').forEach(function (el) {
+          el.addEventListener('click', function () {
+            var id = el.getAttribute('data-id');
+            var idsEl = document.getElementById('user-dar-ids');
+            var actual = (idsEl.value || '').trim();
+            var ids = actual ? actual.split(/[,\s|]+/).map(function (s) { return s.trim(); }).filter(Boolean) : [];
+            if (ids.indexOf(id) === -1) ids.push(id);
+            idsEl.value = ids.join(', ');
+          });
+        });
+      })
+      .catch(function () { listEl.innerHTML = 'Error al cargar.'; });
+  }
+
+  document.getElementById('busqueda-objetos') && document.getElementById('busqueda-objetos').addEventListener('input', function () {
+    var q = this.value.trim();
+    var t = window._userObjetosDebounce;
+    if (t) clearTimeout(t);
+    window._userObjetosDebounce = setTimeout(function () { loadUserObjetos(q); }, 300);
+  });
+
+  document.getElementById('user-dar-btn') && document.getElementById('user-dar-btn').addEventListener('click', function () {
+    var idsEl = document.getElementById('user-dar-ids');
+    var errorEl = document.getElementById('user-dar-error');
+    var okEl = document.getElementById('user-dar-ok');
+    var objetoIds = (idsEl && idsEl.value || '').trim();
+    errorEl.textContent = '';
+    errorEl.classList.remove('visible');
+    okEl.style.display = 'none';
+    if (!userDarPersonajeId || !objetoIds) {
+      errorEl.textContent = 'Indica al menos un ID de objeto (separados por coma).';
+      errorEl.classList.add('visible');
+      return;
+    }
+    if (!getUserHeaders()['X-Cuenta-Id']) {
+      errorEl.textContent = 'Sesi\u00f3n expirada. Vuelve a iniciar sesi\u00f3n.';
+      errorEl.classList.add('visible');
+      return;
+    }
+    fetch('/api/user/dar-objetos', {
+      method: 'POST',
+      headers: getUserHeaders(),
+      body: JSON.stringify({ personajeId: userDarPersonajeId, objetoIds: objetoIds })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.success) {
+          okEl.textContent = data.message || 'Objetos a\u00f1adidos.';
+          okEl.style.display = 'block';
+          idsEl.value = '';
+        } else {
+          errorEl.textContent = data.message || 'Error al dar objetos.';
+          errorEl.classList.add('visible');
+        }
+      })
+      .catch(function () {
+        errorEl.textContent = 'Error de conexi\u00f3n.';
+        errorEl.classList.add('visible');
+      });
+  });
+
+  if (document.getElementById('user-login-btn')) {
+    document.getElementById('user-login-btn').addEventListener('click', function () {
+      var cuenta = (document.getElementById('user-login-cuenta') && document.getElementById('user-login-cuenta').value || '').trim();
+      var pass = (document.getElementById('user-login-contraseña') && document.getElementById('user-login-contraseña').value || '';
+      var errEl = document.getElementById('user-login-error');
+      errEl.textContent = '';
+      errEl.classList.remove('visible');
+      if (!cuenta || !pass) {
+        errEl.textContent = 'Escribe cuenta y contrase\u00f1a.';
+        errEl.classList.add('visible');
+        return;
+      }
+      fetch('/api/user/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cuenta: cuenta, contraseña: pass })
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.success) {
+            sessionStorage.setItem(USER_CUENTA_ID, String(data.cuentaId));
+            sessionStorage.setItem(USER_CUENTA, data.cuenta || cuenta);
+            window.location.hash = 'dashboard';
+          } else {
+            errEl.textContent = data.message || 'Cuenta o contrase\u00f1a incorrectos.';
+            errEl.classList.add('visible');
+          }
+        })
+        .catch(function () {
+          errEl.textContent = 'Error de conexi\u00f3n.';
+          errEl.classList.add('visible');
+        });
+    });
+  }
 
   if (adminLoginBtn) {
     adminLoginBtn.addEventListener('click', function () {

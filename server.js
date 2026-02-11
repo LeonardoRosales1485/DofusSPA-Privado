@@ -152,6 +152,139 @@ app.post('/api/registro', async (req, res) => {
   }
 });
 
+// --- Login de usuarios (cuenta + contraseña → dashboard propio) ---
+app.post('/api/user/login', async (req, res) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  const body = req.body || {};
+  const cuenta = String(body.cuenta || '').trim();
+  const contraseña = String(body.contraseña || body.pass || '');
+
+  if (!cuenta || !contraseña) {
+    return res.status(400).json({ success: false, message: 'Cuenta y contraseña son obligatorios.' });
+  }
+
+  let conn;
+  try {
+    conn = await mysql.createConnection(config.db);
+  } catch (err) {
+    console.error('Conexión BD login:', err.message);
+    return res.status(500).json({ success: false, message: 'Error de conexión.' });
+  }
+
+  try {
+    const [cols] = await conn.execute("SHOW COLUMNS FROM cuentas WHERE Field IN ('pass', 'contraseña')");
+    const passColumn = cols.length && cols.find(c => c.Field === 'contraseña') ? 'contraseña' : 'pass';
+    const [rows] = await conn.execute(
+      `SELECT id, cuenta FROM cuentas WHERE cuenta = ? AND \`${passColumn}\` = ?`,
+      [cuenta, contraseña]
+    );
+    if (rows.length === 0) {
+      return res.status(401).json({ success: false, message: 'Cuenta o contraseña incorrectos.' });
+    }
+    const { id: cuentaId, cuenta: cuentaNombre } = rows[0];
+    res.status(200).json({ success: true, cuentaId: Number(cuentaId), cuenta: cuentaNombre });
+  } catch (err) {
+    console.error('Error login:', err.message);
+    res.status(500).json({ success: false, message: 'Error al comprobar credenciales.' });
+  } finally {
+    if (conn) conn.end();
+  }
+});
+
+// Personajes del usuario logueado (por cuentaId)
+app.get('/api/user/personajes', async (req, res) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  const cuentaId = parseInt(req.headers['x-cuenta-id'] || req.query.cuentaId, 10);
+  if (!cuentaId || isNaN(cuentaId)) {
+    return res.status(401).json({ success: false, message: 'Sesión inválida. Inicia sesión de nuevo.' });
+  }
+
+  const dbConfig = config.dbDinamicos || { ...config.db, database: 'bustar_dinamicos' };
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    const [rows] = await conn.execute(
+      'SELECT id, nombre, nivel, clase FROM personajes WHERE cuenta = ? ORDER BY nombre ASC',
+      [cuentaId]
+    );
+    res.status(200).json({ success: true, data: rows });
+  } catch (err) {
+    console.error('User personajes:', err.message);
+    res.status(500).json({ success: false, message: 'Error al cargar personajes.' });
+  } finally {
+    if (conn) conn.end();
+  }
+});
+
+// Listar objetos modelo (para buscador en "dar objeto") — requiere sesión usuario
+app.get('/api/user/objetos', async (req, res) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  const cuentaId = parseInt(req.headers['x-cuenta-id'] || req.query.cuentaId, 10);
+  if (!cuentaId || isNaN(cuentaId)) {
+    return res.status(401).json({ success: false, message: 'Sesión inválida.' });
+  }
+  const q = String(req.query.q || req.query.nombre || '').trim();
+  const dbConfig = config.dbEstaticos || { ...config.db, database: 'bustar_estaticos' };
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    let sql = 'SELECT id, nombre FROM objetos_modelo';
+    const params = [];
+    if (q) {
+      sql += ' WHERE nombre LIKE ? OR id = ?';
+      params.push('%' + q + '%', isNaN(parseInt(q, 10)) ? -1 : parseInt(q, 10));
+    }
+    sql += ' ORDER BY id ASC LIMIT 300';
+    const [rows] = await conn.execute(sql, params.length ? params : undefined);
+    res.status(200).json({ success: true, data: rows });
+  } catch (err) {
+    console.error('User objetos:', err.message);
+    res.status(500).json({ success: false, message: 'Error al buscar objetos.' });
+  } finally {
+    if (conn) conn.end();
+  }
+});
+
+// Dar objetos a un personaje (usuario solo puede darse a sus propios personajes)
+app.post('/api/user/dar-objetos', async (req, res) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  const cuentaId = parseInt(req.headers['x-cuenta-id'] || (req.body && req.body.cuentaId), 10);
+  if (!cuentaId || isNaN(cuentaId)) {
+    return res.status(401).json({ success: false, message: 'Sesión inválida. Inicia sesión de nuevo.' });
+  }
+
+  const personajeId = parseInt(req.body && req.body.personajeId, 10);
+  let objetoIds = (req.body && req.body.objetoIds) ? String(req.body.objetoIds).trim() : '';
+  if (!personajeId || isNaN(personajeId) || !objetoIds) {
+    return res.status(400).json({ success: false, message: 'Faltan personaje o IDs de objetos.' });
+  }
+
+  const ids = objetoIds.replace(/,/g, '|').split(/\|/).map(s => s.trim()).filter(Boolean);
+  const nuevoValor = ids.join('|');
+
+  const dbConfig = config.dbDinamicos || { ...config.db, database: 'bustar_dinamicos' };
+  let conn;
+  try {
+    conn = await mysql.createConnection(dbConfig);
+    const [[row]] = await conn.execute('SELECT id, objetos, cuenta FROM personajes WHERE id = ?', [personajeId]);
+    if (!row) {
+      return res.status(404).json({ success: false, message: 'Personaje no encontrado.' });
+    }
+    if (Number(row.cuenta) !== cuentaId) {
+      return res.status(403).json({ success: false, message: 'Solo puedes dar objetos a tus propios personajes.' });
+    }
+    const actual = (row.objetos || '').trim();
+    const concatenado = actual ? (actual + '|' + nuevoValor) : nuevoValor;
+    await conn.execute('UPDATE personajes SET objetos = ? WHERE id = ?', [concatenado, personajeId]);
+    res.status(200).json({ success: true, message: 'Objetos añadidos al inventario.' });
+  } catch (err) {
+    console.error('User dar-objetos:', err.message);
+    res.status(500).json({ success: false, message: 'Error al actualizar inventario.' });
+  } finally {
+    if (conn) conn.end();
+  }
+});
+
 // --- Panel admin (protegido por contraseña) ---
 const adminPassword = config.adminPassword || '210696Crows';
 
