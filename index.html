@@ -300,8 +300,16 @@
     #user-dashboard-view .personajes-list { max-height: 360px; overflow: auto; border: 1px solid var(--input-border); border-radius: 8px; padding: 8px; background: #f8fafc; }
     #user-dashboard-view .personaje-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; font-size: 0.9rem; border-radius: 6px; margin-bottom: 6px; background: #fff; border: 1px solid var(--input-border); }
     #user-dashboard-view .personaje-row:last-child { margin-bottom: 0; }
-    #user-dashboard-view .btn-dar { padding: 6px 14px; font-size: 0.85rem; font-weight: 600; background: var(--btn-primary); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; }
+    #user-dashboard-view .personaje-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    #user-dashboard-view .btn-dar { padding: 6px 14px; font-size: 0.85rem; font-weight: 600; background: var(--btn-primary); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; text-decoration: none; }
     #user-dashboard-view .btn-dar:hover { background: var(--btn-hover); }
+    #user-dashboard-view .btn-inventario { padding: 6px 14px; font-size: 0.85rem; font-weight: 600; background: #475569; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; text-decoration: none; }
+    #user-dashboard-view .btn-inventario:hover { background: #64748b; }
+    #user-inventario-view, #admin-inventario-view { display: none; flex-direction: column; padding: 20px 0; min-height: 0; overflow: auto; }
+    #user-inventario-view.visible, #admin-inventario-view.visible { display: flex; }
+    #user-inventario-view .inventario-list, #admin-inventario-view .inventario-list { max-height: 400px; overflow: auto; border: 1px solid var(--input-border); border-radius: 8px; padding: 8px; background: #f8fafc; }
+    #user-inventario-view .inventario-item, #admin-inventario-view .inventario-item { padding: 8px 12px; font-size: 0.9rem; border-radius: 4px; margin-bottom: 4px; background: #fff; border: 1px solid var(--input-border); }
+    #user-inventario-view .inventario-item:last-child, #admin-inventario-view .inventario-item:last-child { margin-bottom: 0; }
     #user-dar-objeto-view .dar-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; min-height: 0; }
     #user-dar-objeto-view .dar-left { display: flex; flex-direction: column; min-width: 0; }
     #user-dar-objeto-view .dar-right { display: flex; flex-direction: column; }
@@ -330,8 +338,14 @@
     #admin-panel-view .list-wrap { max-height: 360px; overflow: auto; border: 1px solid var(--input-border); border-radius: 8px; padding: 8px; background: #f8fafc; }
     #admin-panel-view .list-item { padding: 6px 10px; font-size: 0.9rem; border-radius: 4px; }
     #admin-panel-view .list-item:nth-child(even) { background: #f1f5f9; }
+    #admin-panel-view .list-item-personaje { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
     #admin-panel-view .dar-form .field { max-width: 360px; margin-bottom: 12px; }
     #admin-panel-view .dar-form .btn-submit { margin-top: 12px; }
+    #admin-panel-view .admin-dar-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; min-height: 0; }
+    #admin-panel-view .admin-dar-left, #admin-panel-view .admin-dar-right { display: flex; flex-direction: column; min-width: 0; }
+    #admin-panel-view .list-item-objeto { padding: 6px 10px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; }
+    #admin-panel-view .list-item-objeto:hover { background: #e2e8f0; }
+    @media (max-width: 640px) { #admin-panel-view .admin-dar-layout { grid-template-columns: 1fr; } }
     .back-link { font-size: 0.85rem; margin-bottom: 16px; }
     .back-link a { color: #64748b; text-decoration: none; }
     .back-link a:hover { text-decoration: underline; }
@@ -473,7 +487,6 @@
         <p class="form-title">Panel de administración</p>
         <div class="admin-nav">
           <button type="button" data-section="personajes">Ver personajes</button>
-          <button type="button" data-section="objetos">Buscar objetos</button>
           <button type="button" data-section="dar">Dar objeto(s)</button>
         </div>
 
@@ -481,32 +494,27 @@
           <input type="text" class="filter-input" id="filter-personajes" placeholder="Filtrar por nombre...">
           <div class="list-wrap" id="list-personajes"></div>
         </div>
-        <div id="admin-section-objetos" class="admin-section">
-          <input type="text" class="filter-input" id="filter-objetos" placeholder="Filtrar por nombre...">
-          <div class="list-wrap" id="list-objetos"></div>
-        </div>
         <div id="admin-section-dar" class="admin-section">
-          <form class="dar-form" id="form-dar-objetos">
-            <div class="field">
-              <label for="dar-personaje">Personaje</label>
-              <div class="field-wrap">
-                <select id="dar-personaje" required>
-                  <option value="">Selecciona un personaje</option>
-                </select>
+          <div class="admin-dar-layout">
+            <div class="admin-dar-left">
+              <label for="admin-dar-busqueda" style="font-size: 0.75rem; font-weight: 600; color: #475569;">Buscar objeto</label>
+              <input type="text" id="admin-dar-busqueda" class="busqueda-objetos" placeholder="Nombre o ID del objeto" style="margin-bottom: 8px; padding: 8px 12px; font-size: 0.95rem; border: 2px solid var(--input-border); border-radius: 6px;">
+              <div class="list-wrap-objetos" id="admin-dar-list-objetos" style="max-height: 280px; overflow: auto; border: 1px solid var(--input-border); border-radius: 8px; padding: 8px; background: #f8fafc;"></div>
+            </div>
+            <div class="admin-dar-right">
+              <label for="dar-personaje" style="font-size: 0.75rem; font-weight: 600; color: #475569;">Personaje</label>
+              <select id="dar-personaje" style="margin-top: 4px; margin-bottom: 12px; padding: 8px 12px; font-size: 0.95rem; border: 2px solid var(--input-border); border-radius: 6px; width: 100%;">
+                <option value="">Selecciona un personaje</option>
+              </select>
+              <label for="dar-objeto-ids" style="font-size: 0.75rem; font-weight: 600; color: #475569;">IDs de objetos (separados por coma)</label>
+              <textarea id="dar-objeto-ids" class="input-ids" placeholder="Ej: 6248, 6249, 6250" style="margin-top: 8px; padding: 10px 12px; font-size: 0.95rem; border: 2px solid var(--input-border); border-radius: 6px; min-height: 80px; resize: vertical; font-family: inherit;"></textarea>
+              <div class="submit-wrap" style="margin-top: 12px;">
+                <button type="button" class="btn-submit" id="admin-dar-btn">Dar objetos</button>
               </div>
+              <div class="global-error" id="dar-objetos-error"></div>
+              <p id="dar-objetos-ok" style="display:none; color: var(--valid); font-size: 0.9rem; margin-top: 8px;"></p>
             </div>
-            <div class="field">
-              <label for="dar-objeto-ids">IDs de objetos (separados por | o coma)</label>
-              <div class="field-wrap">
-                <input type="text" id="dar-objeto-ids" placeholder="Ej: 6248|6249|6250 o 6248, 6249" required>
-              </div>
-            </div>
-            <div class="submit-wrap">
-              <button type="submit" class="btn-submit">Dar objetos</button>
-            </div>
-          </form>
-          <div class="global-error" id="dar-objetos-error"></div>
-          <p id="dar-objetos-ok" style="display:none; color: var(--valid); font-size: 0.9rem; margin-top: 8px;"></p>
+          </div>
         </div>
       </div>
 
@@ -522,9 +530,9 @@
           </div>
         </div>
         <div class="field" style="max-width: 320px; margin-top: 12px;">
-          <label for="user-login-contraseña">Contraseña</label>
+          <label for="user-login-password">Contraseña</label>
           <div class="field-wrap">
-            <input type="password" id="user-login-contraseña" placeholder="Contraseña" autocomplete="current-password">
+            <input type="password" id="user-login-password" placeholder="Contraseña" autocomplete="current-password">
           </div>
         </div>
         <div class="submit-wrap" style="margin-top: 16px;">
@@ -559,6 +567,18 @@
             <p id="user-dar-ok" style="display:none; color: var(--valid); font-size: 0.9rem; margin-top: 8px;"></p>
           </div>
         </div>
+      </div>
+
+      <div id="user-inventario-view">
+        <p class="back-link"><a href="#dashboard">&larr; Volver al dashboard</a></p>
+        <p class="form-title" id="user-inventario-titulo">Objetos en inventario</p>
+        <div class="inventario-list" id="user-inventario-list"></div>
+      </div>
+
+      <div id="admin-inventario-view">
+        <p class="back-link"><a href="#admin">&larr; Volver al panel</a></p>
+        <p class="form-title" id="admin-inventario-titulo">Objetos en inventario</p>
+        <div class="inventario-list" id="admin-inventario-list"></div>
       </div>
     </div>
   </div>
@@ -699,16 +719,15 @@
   var userLoginView = document.getElementById('user-login-view');
   var userDashboardView = document.getElementById('user-dashboard-view');
   var userDarObjetoView = document.getElementById('user-dar-objeto-view');
+  var userInventarioView = document.getElementById('user-inventario-view');
+  var adminInventarioView = document.getElementById('admin-inventario-view');
   var adminPasswordInput = document.getElementById('admin-password');
   var adminLoginBtn = document.getElementById('admin-login-btn');
   var adminLoginError = document.getElementById('admin-login-error');
   var filterPersonajes = document.getElementById('filter-personajes');
-  var filterObjetos = document.getElementById('filter-objetos');
   var listPersonajes = document.getElementById('list-personajes');
-  var listObjetos = document.getElementById('list-objetos');
   var darPersonajeSelect = document.getElementById('dar-personaje');
   var darObjetoIdsInput = document.getElementById('dar-objeto-ids');
-  var formDarObjetos = document.getElementById('form-dar-objetos');
   var darObjetosError = document.getElementById('dar-objetos-error');
   var darObjetosOk = document.getElementById('dar-objetos-ok');
 
@@ -723,20 +742,15 @@
   }
 
   function showView(which) {
-    formView.classList.remove('hidden');
-    if (which !== 'form') formView.classList.add('hidden');
-    successView.classList.remove('visible');
-    if (which === 'success') successView.classList.add('visible');
-    adminLoginView.classList.remove('visible');
-    if (which === 'admin-login') adminLoginView.classList.add('visible');
-    adminPanelView.classList.remove('visible');
-    if (which === 'admin') adminPanelView.classList.add('visible');
-    userLoginView.classList.remove('visible');
-    if (which === 'user-login') userLoginView.classList.add('visible');
-    userDashboardView.classList.remove('visible');
-    if (which === 'user-dashboard') userDashboardView.classList.add('visible');
-    userDarObjetoView.classList.remove('visible');
-    if (which === 'user-dar-objeto') userDarObjetoView.classList.add('visible');
+    if (formView) { formView.classList.remove('hidden'); if (which !== 'form') formView.classList.add('hidden'); }
+    if (successView) { successView.classList.remove('visible'); if (which === 'success') successView.classList.add('visible'); }
+    if (adminLoginView) { adminLoginView.classList.remove('visible'); if (which === 'admin-login') adminLoginView.classList.add('visible'); }
+    if (adminPanelView) { adminPanelView.classList.remove('visible'); if (which === 'admin') adminPanelView.classList.add('visible'); }
+    if (userLoginView) { userLoginView.classList.remove('visible'); if (which === 'user-login') userLoginView.classList.add('visible'); }
+    if (userDashboardView) { userDashboardView.classList.remove('visible'); if (which === 'user-dashboard') userDashboardView.classList.add('visible'); }
+    if (userDarObjetoView) { userDarObjetoView.classList.remove('visible'); if (which === 'user-dar-objeto') userDarObjetoView.classList.add('visible'); }
+    if (userInventarioView) { userInventarioView.classList.remove('visible'); if (which === 'user-inventario') userInventarioView.classList.add('visible'); }
+    if (adminInventarioView) { adminInventarioView.classList.remove('visible'); if (which === 'admin-inventario') adminInventarioView.classList.add('visible'); }
   }
 
   function showAdminSection(sectionId) {
@@ -747,8 +761,10 @@
     var btn = document.querySelector('#admin-panel-view .admin-nav button[data-section="' + sectionId + '"]');
     if (btn) btn.classList.add('active');
     if (sectionId === 'personajes') loadPersonajes();
-    if (sectionId === 'objetos') loadObjetos();
-    if (sectionId === 'dar') fillDarPersonajes();
+    if (sectionId === 'dar') {
+      fillDarPersonajes();
+      loadAdminDarObjetos();
+    }
   }
 
   function applyRoute() {
@@ -793,13 +809,33 @@
       }
       showView('user-dar-objeto');
       initUserDarObjeto(parseInt(params.id, 10));
+    } else if (base === 'inventario' && params.id) {
+      if (!sessionStorage.getItem(USER_CUENTA_ID)) {
+        window.location.hash = 'login';
+        showView('user-login');
+        return;
+      }
+      showView('user-inventario');
+      initUserInventario(parseInt(params.id, 10));
+    } else if (base === 'admin-inventario' && params.id) {
+      if (!sessionStorage.getItem(ADMIN_STORAGE)) {
+        window.location.hash = '';
+        showView('form');
+        return;
+      }
+      showView('admin-inventario');
+      initAdminInventario(parseInt(params.id, 10));
     } else {
       showView('form');
     }
   }
 
   window.addEventListener('hashchange', applyRoute);
-  window.addEventListener('load', applyRoute);
+  if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', applyRoute);
+  } else {
+    applyRoute();
+  }
 
   document.querySelectorAll('a[href="#"]').forEach(function (a) {
     a.addEventListener('click', function (e) {
@@ -860,7 +896,7 @@
           return;
         }
         listEl.innerHTML = list.map(function (p) {
-          return '<div class="personaje-row"><span><strong>' + (p.nombre || '-') + '</strong> (nivel ' + (p.nivel || 0) + ')</span><a href="#dar-objeto?id=' + p.id + '" class="btn-dar">Dar objeto</a></div>';
+          return '<div class="personaje-row"><span><strong>' + (p.nombre || '-') + '</strong> (nivel ' + (p.nivel || 0) + ')</span><div class="personaje-actions"><a href="#dar-objeto?id=' + p.id + '" class="btn-dar">Dar objeto</a><a href="#inventario?id=' + p.id + '" class="btn-inventario">Ver objetos en inventario</a></div></div>';
         }).join('');
       })
       .catch(function () { listEl.innerHTML = 'Error al cargar personajes.'; });
@@ -880,6 +916,94 @@
     document.getElementById('user-dar-ok').style.display = 'none';
     document.getElementById('busqueda-objetos').value = '';
     loadUserObjetos('');
+  }
+
+  function initUserInventario(personajeId) {
+    var titulo = document.getElementById('user-inventario-titulo');
+    var listEl = document.getElementById('user-inventario-list');
+    if (titulo) titulo.textContent = 'Cargando inventario...';
+    if (listEl) listEl.innerHTML = 'Cargando...';
+    var headers = getUserHeaders();
+    if (!headers['X-Cuenta-Id']) {
+      if (listEl) listEl.innerHTML = 'Sesi\u00f3n inv\u00e1lida. <a href="#login">Inicia sesi\u00f3n</a>.';
+      if (titulo) titulo.textContent = 'Objetos en inventario';
+      return;
+    }
+    fetch('/api/user/inventario?personajeId=' + personajeId, { headers: headers })
+      .then(function (r) {
+        return r.text().then(function (text) {
+          try { return { ok: r.ok, data: JSON.parse(text) }; } catch (e) { return { ok: r.ok, data: null, raw: text }; }
+        });
+      })
+      .then(function (result) {
+        var data = result.data;
+        if (!data || typeof data.success === 'undefined') {
+          if (listEl) listEl.innerHTML = 'Respuesta inv\u00e1lida del servidor. Comprueba que el servidor est\u00e9 en marcha.';
+          if (titulo) titulo.textContent = 'Objetos en inventario';
+          return;
+        }
+        if (!data.success) {
+          if (listEl) listEl.innerHTML = data.message || 'No se pudo cargar el inventario.';
+          if (titulo) titulo.textContent = 'Objetos en inventario';
+          return;
+        }
+        var nombre = data.personajeNombre || 'Personaje';
+        if (titulo) titulo.textContent = 'Inventario de ' + nombre;
+        var items = data.data || [];
+        if (listEl) {
+          listEl.innerHTML = items.length ? items.map(function (o) {
+            return '<div class="inventario-item">' + o.id + ' &ndash; ' + (o.nombre || '-') + '</div>';
+          }).join('') : 'No hay objetos en el inventario.';
+        }
+      })
+      .catch(function (err) {
+        if (listEl) listEl.innerHTML = 'Error al cargar. Comprueba la consola y que el servidor est\u00e9 activo.';
+        if (titulo) titulo.textContent = 'Objetos en inventario';
+      });
+  }
+
+  function initAdminInventario(personajeId) {
+    var titulo = document.getElementById('admin-inventario-titulo');
+    var listEl = document.getElementById('admin-inventario-list');
+    if (titulo) titulo.textContent = 'Cargando inventario...';
+    if (listEl) listEl.innerHTML = 'Cargando...';
+    var headers = getAdminHeaders();
+    if (!headers['X-Admin-Password']) {
+      if (listEl) listEl.innerHTML = 'Sesi\u00f3n admin expirada. Vuelve a entrar.';
+      if (titulo) titulo.textContent = 'Objetos en inventario';
+      return;
+    }
+    fetch('/api/admin/inventario?personajeId=' + personajeId, { headers: headers })
+      .then(function (r) {
+        return r.text().then(function (text) {
+          try { return { ok: r.ok, data: JSON.parse(text) }; } catch (e) { return { ok: r.ok, data: null }; }
+        });
+      })
+      .then(function (result) {
+        var data = result.data;
+        if (!data || typeof data.success === 'undefined') {
+          if (listEl) listEl.innerHTML = 'Respuesta inv\u00e1lida del servidor.';
+          if (titulo) titulo.textContent = 'Objetos en inventario';
+          return;
+        }
+        if (!data.success) {
+          if (listEl) listEl.innerHTML = data.message || 'No se pudo cargar el inventario.';
+          if (titulo) titulo.textContent = 'Objetos en inventario';
+          return;
+        }
+        var nombre = data.personajeNombre || 'Personaje';
+        if (titulo) titulo.textContent = 'Inventario de ' + nombre;
+        var items = data.data || [];
+        if (listEl) {
+          listEl.innerHTML = items.length ? items.map(function (o) {
+            return '<div class="inventario-item">' + o.id + ' &ndash; ' + (o.nombre || '-') + '</div>';
+          }).join('') : 'No hay objetos en el inventario.';
+        }
+      })
+      .catch(function () {
+        if (listEl) listEl.innerHTML = 'Error al cargar. Comprueba que el servidor est\u00e9 activo.';
+        if (titulo) titulo.textContent = 'Objetos en inventario';
+      });
   }
 
   function loadUserObjetos(q) {
@@ -962,7 +1086,7 @@
   if (document.getElementById('user-login-btn')) {
     document.getElementById('user-login-btn').addEventListener('click', function () {
       var cuenta = (document.getElementById('user-login-cuenta') && document.getElementById('user-login-cuenta').value || '').trim();
-      var pass = (document.getElementById('user-login-contraseña') && document.getElementById('user-login-contraseña').value || '';
+      var pass = (document.getElementById('user-login-password') && document.getElementById('user-login-password').value) || "";
       var errEl = document.getElementById('user-login-error');
       errEl.textContent = '';
       errEl.classList.remove('visible');
@@ -974,7 +1098,7 @@
       fetch('/api/user/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cuenta: cuenta, contraseña: pass })
+        body: JSON.stringify({ cuenta: cuenta, contrase\u00f1a: pass })
       })
         .then(function (r) { return r.json(); })
         .then(function (data) {
@@ -1039,32 +1163,56 @@
     var q = (filterPersonajes && filterPersonajes.value || '').toLowerCase().trim();
     if (q) list = list.filter(function (p) { return (p.nombre || '').toLowerCase().indexOf(q) !== -1; });
     listPersonajes.innerHTML = list.length ? list.map(function (p) {
-      return '<div class="list-item">ID ' + p.id + ' &ndash; ' + (p.nombre || '-') + ' (nivel ' + (p.nivel || 0) + ')</div>';
+      return '<div class="list-item list-item-personaje"><span>ID ' + p.id + ' &ndash; ' + (p.nombre || '-') + ' (nivel ' + (p.nivel || 0) + ')</span> <a href="#admin-inventario?id=' + p.id + '" class="btn-inventario" style="padding: 4px 10px; font-size: 0.8rem; background: #475569; color: #fff; border-radius: 4px; text-decoration: none;">Ver objetos en inventario</a></div>';
     }).join('') : 'No hay personajes o no coinciden con el filtro.';
   }
   if (filterPersonajes) filterPersonajes.addEventListener('input', function () { renderListPersonajes(); });
 
-  function loadObjetos() {
-    listObjetos.innerHTML = 'Cargando...';
+  function loadAdminDarObjetos() {
+    var listEl = document.getElementById('admin-dar-list-objetos');
+    var busquedaEl = document.getElementById('admin-dar-busqueda');
+    if (!listEl) return;
+    listEl.innerHTML = 'Cargando...';
     fetch('/api/admin/objetos', { headers: getAdminHeaders() })
       .then(function (r) { return r.json(); })
       .then(function (data) {
-        if (!data.success) { listObjetos.innerHTML = 'No autorizado o error.'; return; }
+        if (!data.success) { listEl.innerHTML = 'No autorizado o error.'; return; }
         window._adminObjetos = data.data || [];
-        renderListObjetos();
+        renderAdminDarObjetos();
       })
-      .catch(function () { listObjetos.innerHTML = 'Error al cargar.'; });
+      .catch(function () { listEl.innerHTML = 'Error al cargar.'; });
   }
 
-  function renderListObjetos() {
+  function renderAdminDarObjetos() {
+    var listEl = document.getElementById('admin-dar-list-objetos');
+    var busquedaEl = document.getElementById('admin-dar-busqueda');
+    if (!listEl) return;
     var list = window._adminObjetos || [];
-    var q = (filterObjetos && filterObjetos.value || '').toLowerCase().trim();
+    var q = (busquedaEl && busquedaEl.value || '').toLowerCase().trim();
     if (q) list = list.filter(function (o) { return ((o.nombre || '') + ' ' + (o.id || '')).toLowerCase().indexOf(q) !== -1; });
-    listObjetos.innerHTML = list.length ? list.map(function (o) {
-      return '<div class="list-item">ID ' + o.id + ' &ndash; ' + (o.nombre || '-') + '</div>';
-    }).join('') : 'No hay objetos o no coinciden con el filtro.';
+    list = list.slice(0, 300);
+    listEl.innerHTML = list.length ? list.map(function (o) {
+      return '<div class="list-item-objeto" data-id="' + o.id + '">' + o.id + ' &ndash; ' + (o.nombre || '-').replace(/"/g, '&quot;') + '</div>';
+    }).join('') : 'Escribe en el buscador para filtrar.';
+    listEl.querySelectorAll('.list-item-objeto').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var id = el.getAttribute('data-id');
+        var idsEl = document.getElementById('dar-objeto-ids');
+        if (!idsEl) return;
+        var actual = (idsEl.value || '').trim();
+        var ids = actual ? actual.split(/[,\s|]+/).map(function (s) { return s.trim(); }).filter(Boolean) : [];
+        if (ids.indexOf(id) === -1) ids.push(id);
+        idsEl.value = ids.join(', ');
+      });
+    });
   }
-  if (filterObjetos) filterObjetos.addEventListener('input', function () { renderListObjetos(); });
+
+  var adminDarBusquedaEl = document.getElementById('admin-dar-busqueda');
+  if (adminDarBusquedaEl) {
+    adminDarBusquedaEl.addEventListener('input', function () {
+      if (window._adminObjetos) renderAdminDarObjetos();
+    });
+  }
 
   function fillDarPersonajes() {
     darPersonajeSelect.innerHTML = '<option value="">Cargando...</option>';
@@ -1082,9 +1230,9 @@
       .catch(function () { darPersonajeSelect.innerHTML = '<option value="">Error al cargar</option>'; });
   }
 
-  if (formDarObjetos) {
-    formDarObjetos.addEventListener('submit', function (e) {
-      e.preventDefault();
+  var adminDarBtn = document.getElementById('admin-dar-btn');
+  if (adminDarBtn) {
+    adminDarBtn.addEventListener('click', function () {
       darObjetosError.textContent = '';
       darObjetosError.classList.remove('visible');
       darObjetosOk.style.display = 'none';
@@ -1123,6 +1271,8 @@
         });
     });
   }
+
+  applyRoute();
 })();
   </script>
 </body>

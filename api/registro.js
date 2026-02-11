@@ -1,17 +1,17 @@
 const mysql = require('mysql2/promise');
 
 function getDbConfig() {
-  const host = process.env.DB_HOST || 'localhost';
-  const isCloud = host !== 'localhost' && !host.startsWith('127.');
+  const host = process.env.DB_HOST || 'tu-host.aivencloud.com';
+  const port = parseInt(process.env.DB_PORT, 10) || 15482;
   const config = {
-    host: host,
-    port: parseInt(process.env.DB_PORT, 10) || 3306,
+    host,
+    port,
     database: process.env.DB_NAME || 'bustar_cuentas',
-    user: process.env.DB_USER || 'root',
+    user: process.env.DB_USER || 'avnadmin',
     password: process.env.DB_PASS || '',
     charset: 'utf8mb4',
   };
-  if (isCloud) {
+  if (port !== 3306 || host.includes('aivencloud')) {
     config.ssl = { rejectUnauthorized: false };
   }
   return config;

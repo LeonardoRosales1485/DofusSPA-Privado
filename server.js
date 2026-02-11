@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const path = require('path');
 const express = require('express');
 const mysql = require('mysql2/promise');
@@ -6,32 +8,19 @@ let config;
 try {
   config = require('./config');
 } catch (e) {
+  // Por defecto Aiven (localhost y deploy usan la misma BD en la nube)
+  const dbBase = {
+    host: process.env.DB_HOST || 'tu-host.aivencloud.com',
+    port: parseInt(process.env.DB_PORT, 10) || 15482,
+    user: process.env.DB_USER || 'avnadmin',
+    password: process.env.DB_PASS || '',
+    charset: 'utf8mb4',
+  };
   config = {
     port: process.env.PORT || 3000,
-    db: {
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT, 10) || 3306,
-      database: process.env.DB_NAME || 'bustar_cuentas',
-      user: process.env.DB_USER || 'root',
-      password: process.env.DB_PASS || '',
-      charset: 'utf8mb4',
-    },
-    dbDinamicos: {
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT, 10) || 3306,
-      database: process.env.DB_DINAMICOS || 'bustar_dinamicos',
-      user: process.env.DB_USER || 'root',
-      password: process.env.DB_PASS || '',
-      charset: 'utf8mb4',
-    },
-    dbEstaticos: {
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT, 10) || 3306,
-      database: process.env.DB_ESTATICOS || 'bustar_estaticos',
-      user: process.env.DB_USER || 'root',
-      password: process.env.DB_PASS || '',
-      charset: 'utf8mb4',
-    },
+    db: { ...dbBase, database: process.env.DB_NAME || 'bustar_cuentas' },
+    dbDinamicos: { ...dbBase, database: process.env.DB_DINAMICOS || 'bustar_dinamicos' },
+    dbEstaticos: { ...dbBase, database: process.env.DB_ESTATICOS || 'bustar_estaticos' },
     adminPassword: process.env.ADMIN_PASSWORD || '210696Crows',
   };
 }
@@ -245,7 +234,78 @@ app.get('/api/user/objetos', async (req, res) => {
   }
 });
 
+// Inventario de un personaje (usuario solo sus personajes)
+app.get('/api/user/inventario', async (req, res) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  const cuentaId = parseInt(req.headers['x-cuenta-id'] || req.query.cuentaId, 10);
+  const personajeId = parseInt(req.query.personajeId, 10);
+  if (!cuentaId || isNaN(cuentaId) || !personajeId || isNaN(personajeId)) {
+    return res.status(400).json({ success: false, message: 'Sesión o personaje inválido.' });
+  }
+  const dbDinamicos = config.dbDinamicos || { ...config.db, database: 'bustar_dinamicos' };
+  const dbEstaticos = config.dbEstaticos || { ...config.db, database: 'bustar_estaticos' };
+  let connD = null;
+  let connE = null;
+  try {
+    connD = await mysql.createConnection(dbDinamicos);
+    let [[row]] = await connD.execute('SELECT id, nombre, objetos FROM personajes WHERE id = ? AND cuenta = ?', [personajeId, cuentaId]);
+    if (!row) {
+      const connCuentas = await mysql.createConnection(config.db);
+      const [[cuentaRow]] = await connCuentas.execute('SELECT cuenta FROM cuentas WHERE id = ?', [cuentaId]).catch(() => [[null]]);
+      connCuentas.end();
+      if (cuentaRow && cuentaRow.cuenta) {
+        [[row]] = await connD.execute('SELECT id, nombre, objetos FROM personajes WHERE id = ? AND cuenta = ?', [personajeId, cuentaRow.cuenta]);
+      }
+    }
+    if (!row) {
+      return res.status(404).json({ success: false, message: 'Personaje no encontrado.' });
+    }
+    const raw = String(row.objetos || '').trim();
+    const instanceIdStrs = raw ? raw.split(/\|/).map(s => String(s).trim()).filter(Boolean) : [];
+    const personajeNombre = String(row.nombre || '');
+    if (instanceIdStrs.length === 0) {
+      return res.status(200).json({ success: true, data: [], personajeNombre });
+    }
+    const instanceIds = instanceIdStrs.map(s => parseInt(s, 10)).filter(n => !isNaN(n));
+    if (instanceIds.length === 0) {
+      return res.status(200).json({ success: true, data: [], personajeNombre });
+    }
+    const placeholdersD = instanceIds.map(() => '?').join(',');
+    const [instances] = await connD.execute(
+      `SELECT id, modelo FROM objetos WHERE id IN (${placeholdersD})`,
+      instanceIds
+    );
+    const modeloById = {};
+    (instances || []).forEach(r => { modeloById[r.id] = r.modelo; });
+    const modeloIds = [...new Set(Object.values(modeloById).filter(x => x != null))];
+    let nombresByModelo = {};
+    if (modeloIds.length > 0) {
+      connE = await mysql.createConnection(dbEstaticos);
+      const placeholdersE = modeloIds.map(() => '?').join(',');
+      const [modelos] = await connE.execute(
+        `SELECT id, nombre FROM objetos_modelo WHERE id IN (${placeholdersE})`,
+        modeloIds
+      );
+      (modelos || []).forEach(o => { nombresByModelo[o.id] = String(o.nombre || ''); });
+    }
+    const data = instanceIdStrs.map(s => {
+      const instId = parseInt(s, 10);
+      const idObjeto = modeloById[instId];
+      const nombre = idObjeto != null ? (nombresByModelo[idObjeto] || '(ID ' + idObjeto + ')') : '(instancia ' + s + ')';
+      return { id: idObjeto != null ? idObjeto : s, nombre };
+    });
+    res.status(200).json({ success: true, data, personajeNombre });
+  } catch (err) {
+    console.error('User inventario:', err.message);
+    res.status(500).json({ success: false, message: 'Error al cargar inventario.' });
+  } finally {
+    if (connD) try { connD.end(); } catch (e) {}
+    if (connE) try { connE.end(); } catch (e) {}
+  }
+});
+
 // Dar objetos a un personaje (usuario solo puede darse a sus propios personajes)
+// objetoIds = IDs de modelo (objetos_modelo). Se crean filas en tabla objetos y se enlazan al personaje.
 app.post('/api/user/dar-objetos', async (req, res) => {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   const cuentaId = parseInt(req.headers['x-cuenta-id'] || (req.body && req.body.cuentaId), 10);
@@ -259,8 +319,10 @@ app.post('/api/user/dar-objetos', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Faltan personaje o IDs de objetos.' });
   }
 
-  const ids = objetoIds.replace(/,/g, '|').split(/\|/).map(s => s.trim()).filter(Boolean);
-  const nuevoValor = ids.join('|');
+  const modeloIds = objetoIds.replace(/,/g, '|').split(/\|/).map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n > 0);
+  if (modeloIds.length === 0) {
+    return res.status(400).json({ success: false, message: 'Indica al menos un ID de objeto (modelo) válido.' });
+  }
 
   const dbConfig = config.dbDinamicos || { ...config.db, database: 'bustar_dinamicos' };
   let conn;
@@ -273,8 +335,19 @@ app.post('/api/user/dar-objetos', async (req, res) => {
     if (Number(row.cuenta) !== cuentaId) {
       return res.status(403).json({ success: false, message: 'Solo puedes dar objetos a tus propios personajes.' });
     }
-    const actual = (row.objetos || '').trim();
-    const concatenado = actual ? (actual + '|' + nuevoValor) : nuevoValor;
+    const [[{ maxId }]] = await conn.execute('SELECT COALESCE(MAX(id), 0) AS maxId FROM objetos');
+    let nextId = Number(maxId) + 1;
+    const newInstanceIds = [];
+    for (const modeloId of modeloIds) {
+      await conn.execute(
+        'INSERT INTO objetos (id, modelo, cantidad, posicion, stats, objevivo, precio) VALUES (?, ?, 1, -1, ?, 0, 0)',
+        [nextId, modeloId, '']
+      );
+      newInstanceIds.push(nextId);
+      nextId += 1;
+    }
+    const actual = String(row.objetos || '').trim();
+    const concatenado = actual ? (actual + '|' + newInstanceIds.join('|')) : newInstanceIds.join('|');
     await conn.execute('UPDATE personajes SET objetos = ? WHERE id = ?', [concatenado, personajeId]);
     res.status(200).json({ success: true, message: 'Objetos añadidos al inventario.' });
   } catch (err) {
@@ -320,6 +393,69 @@ app.get('/api/admin/personajes', async (req, res) => {
   }
 });
 
+app.get('/api/admin/inventario', async (req, res) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  if (!checkAdminPassword(req)) {
+    return res.status(401).json({ success: false, message: 'No autorizado.' });
+  }
+  const personajeId = parseInt(req.query.personajeId, 10);
+  if (!personajeId || isNaN(personajeId)) {
+    return res.status(400).json({ success: false, message: 'personajeId obligatorio.' });
+  }
+  const dbDinamicos = config.dbDinamicos || { ...config.db, database: 'bustar_dinamicos' };
+  const dbEstaticos = config.dbEstaticos || { ...config.db, database: 'bustar_estaticos' };
+  let connD = null;
+  let connE = null;
+  try {
+    connD = await mysql.createConnection(dbDinamicos);
+    const [[row]] = await connD.execute('SELECT id, nombre, objetos FROM personajes WHERE id = ?', [personajeId]);
+    if (!row) {
+      return res.status(404).json({ success: false, message: 'Personaje no encontrado.' });
+    }
+    const raw = String(row.objetos || '').trim();
+    const instanceIdStrs = raw ? raw.split(/\|/).map(s => String(s).trim()).filter(Boolean) : [];
+    const personajeNombre = String(row.nombre || '');
+    if (instanceIdStrs.length === 0) {
+      return res.status(200).json({ success: true, data: [], personajeNombre });
+    }
+    const instanceIds = instanceIdStrs.map(s => parseInt(s, 10)).filter(n => !isNaN(n));
+    if (instanceIds.length === 0) {
+      return res.status(200).json({ success: true, data: [], personajeNombre });
+    }
+    const placeholdersD = instanceIds.map(() => '?').join(',');
+    const [instances] = await connD.execute(
+      `SELECT id, modelo FROM objetos WHERE id IN (${placeholdersD})`,
+      instanceIds
+    );
+    const modeloById = {};
+    (instances || []).forEach(r => { modeloById[r.id] = r.modelo; });
+    const modeloIds = [...new Set(Object.values(modeloById).filter(x => x != null))];
+    let nombresByModelo = {};
+    if (modeloIds.length > 0) {
+      connE = await mysql.createConnection(dbEstaticos);
+      const placeholdersE = modeloIds.map(() => '?').join(',');
+      const [modelos] = await connE.execute(
+        `SELECT id, nombre FROM objetos_modelo WHERE id IN (${placeholdersE})`,
+        modeloIds
+      );
+      (modelos || []).forEach(o => { nombresByModelo[o.id] = String(o.nombre || ''); });
+    }
+    const data = instanceIdStrs.map(s => {
+      const instId = parseInt(s, 10);
+      const idObjeto = modeloById[instId];
+      const nombre = idObjeto != null ? (nombresByModelo[idObjeto] || '(ID ' + idObjeto + ')') : '(instancia ' + s + ')';
+      return { id: idObjeto != null ? idObjeto : s, nombre };
+    });
+    res.status(200).json({ success: true, data, personajeNombre });
+  } catch (err) {
+    console.error('Admin inventario:', err.message);
+    res.status(500).json({ success: false, message: 'Error al cargar inventario.' });
+  } finally {
+    if (connD) try { connD.end(); } catch (e) {}
+    if (connE) try { connE.end(); } catch (e) {}
+  }
+});
+
 app.get('/api/admin/objetos', async (req, res) => {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   if (!checkAdminPassword(req)) {
@@ -341,6 +477,7 @@ app.get('/api/admin/objetos', async (req, res) => {
   }
 });
 
+// Dar objetos: objetoIds = IDs de modelo (objetos_modelo). Se crean filas en tabla objetos y se enlazan al personaje.
 app.post('/api/admin/dar-objetos', async (req, res) => {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   if (!checkAdminPassword(req)) {
@@ -351,9 +488,10 @@ app.post('/api/admin/dar-objetos', async (req, res) => {
   if (!personajeId || isNaN(personajeId) || !objetoIds) {
     return res.status(400).json({ success: false, message: 'Faltan personajeId u objetoIds.' });
   }
-  // Aceptar "6248|6249" o "6248, 6249" o "6248 6249"
-  const ids = objetoIds.replace(/,/g, '|').split(/\|/).map(s => s.trim()).filter(Boolean);
-  const nuevoValor = ids.join('|');
+  const modeloIds = objetoIds.replace(/,/g, '|').split(/\|/).map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n > 0);
+  if (modeloIds.length === 0) {
+    return res.status(400).json({ success: false, message: 'Indica al menos un ID de objeto (modelo) válido.' });
+  }
   const dbConfig = config.dbDinamicos || { ...config.db, database: 'bustar_dinamicos' };
   let conn;
   try {
@@ -362,8 +500,19 @@ app.post('/api/admin/dar-objetos', async (req, res) => {
     if (!row) {
       return res.status(404).json({ success: false, message: 'Personaje no encontrado.' });
     }
-    const actual = (row.objetos || '').trim();
-    const concatenado = actual ? (actual + '|' + nuevoValor) : nuevoValor;
+    const [[{ maxId }]] = await conn.execute('SELECT COALESCE(MAX(id), 0) AS maxId FROM objetos');
+    let nextId = Number(maxId) + 1;
+    const newInstanceIds = [];
+    for (const modeloId of modeloIds) {
+      await conn.execute(
+        'INSERT INTO objetos (id, modelo, cantidad, posicion, stats, objevivo, precio) VALUES (?, ?, 1, -1, ?, 0, 0)',
+        [nextId, modeloId, '']
+      );
+      newInstanceIds.push(nextId);
+      nextId += 1;
+    }
+    const actual = String(row.objetos || '').trim();
+    const concatenado = actual ? (actual + '|' + newInstanceIds.join('|')) : newInstanceIds.join('|');
     await conn.execute('UPDATE personajes SET objetos = ? WHERE id = ?', [concatenado, personajeId]);
     res.status(200).json({ success: true, message: 'Objetos añadidos al inventario.' });
   } catch (err) {
@@ -379,5 +528,7 @@ app.get('*', (req, res) => {
 });
 
 app.listen(config.port, () => {
+  const dbHost = (config.db && config.db.host) || '';
   console.log('Servidor SPA registro en http://localhost:' + config.port);
+  console.log('BD: host =', dbHost || '(no definido; define DB_HOST o crea config.js)');
 });

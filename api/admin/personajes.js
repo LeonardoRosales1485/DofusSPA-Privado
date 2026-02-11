@@ -8,17 +8,17 @@ function checkPassword(req) {
 }
 
 function getDbConfig() {
-  const host = process.env.DB_HOST || 'localhost';
-  const isCloud = host !== 'localhost' && !host.startsWith('127.');
+  const host = process.env.DB_HOST || 'tu-host.aivencloud.com';
+  const port = parseInt(process.env.DB_PORT, 10) || 15482;
   const config = {
     host,
-    port: parseInt(process.env.DB_PORT, 10) || 3306,
+    port,
     database: process.env.DB_DINAMICOS || 'bustar_dinamicos',
-    user: process.env.DB_USER || 'root',
+    user: process.env.DB_USER || 'avnadmin',
     password: process.env.DB_PASS || '',
     charset: 'utf8mb4',
   };
-  if (isCloud) config.ssl = { rejectUnauthorized: false };
+  if (port !== 3306 || host.includes('aivencloud')) config.ssl = { rejectUnauthorized: false };
   return config;
 }
 

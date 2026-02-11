@@ -1,7 +1,10 @@
 /**
- * Plantilla de configuración. Copia a config.js y rellena con tus datos.
- * config.js no se sube al repositorio (está en .gitignore).
- * En Vercel se usan las variables de entorno DB_*.
+ * Plantilla de configuración. config.js no se sube al repositorio (.gitignore).
+ * Localhost y deploy usan SIEMPRE la BD de Aiven (nunca MySQL local).
+ *
+ * Opciones:
+ * 1) Usar config.js: copia este archivo a config.js y pon tu host Aiven y password.
+ * 2) Variables de entorno: DB_HOST, DB_USER, DB_PASS (en .env local o en Vercel).
  */
 module.exports = {
   port: process.env.PORT || 3000,
