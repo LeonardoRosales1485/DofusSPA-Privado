@@ -115,16 +115,37 @@
       text-transform: uppercase;
     }
 
+    .filtro-objetos-stack,
+    .filtro-panes-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 12px;
+    }
+    .filtro-objetos-stack label,
+    .filtro-panes-stack label { display: block; }
+    .filtro-input {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      border: 2px solid var(--input-border);
+      border-radius: 6px;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    .filtro-input:focus { outline: none; border-color: var(--btn-primary); }
+
     .form-columns {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0 20px;
     }
 
-    .form-columns .submit-wrap {
+    .form-columns .submit-wrap,
+    .form-columns .form-actions-grid {
       grid-column: 1 / -1;
-      margin-top: 16px;
     }
+    .form-columns .submit-wrap { margin-top: 16px; }
 
     .field {
       margin-bottom: 10px;
@@ -290,17 +311,61 @@
     .admin-link { margin-top: 16px; }
     .admin-link a { color: var(--btn-primary); font-size: 0.9rem; text-decoration: none; }
     .admin-link a:hover { text-decoration: underline; }
-    .top-links { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
-    .top-links a { color: var(--btn-primary); font-size: 0.9rem; text-decoration: none; }
-    .top-links a:hover { text-decoration: underline; }
+    .form-actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .form-actions-grid .btn-submit,
+    .form-actions-grid .btn-action-link {
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .form-actions-grid .btn-action-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--btn-primary);
+      color: #fff;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .form-actions-grid .btn-action-link:hover { background: var(--btn-hover); }
+    .form-actions-grid .btn-action-link.btn-special { background: #b45309 !important; color: #fff !important; }
+    .form-actions-grid .btn-action-link.btn-special:hover { background: #d97706 !important; }
+    .top-links { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+    .top-links.bottom-links { margin-top: 20px; margin-bottom: 0; }
+    .top-links a {
+      display: inline-block;
+      background: var(--btn-primary);
+      color: #fff;
+      border: none;
+      padding: 12px 32px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .top-links a:hover { background: var(--btn-hover); }
+    .btn-special { background: #b45309 !important; color: #fff !important; }
+    .btn-special:hover { background: #d97706 !important; }
 
-    #user-login-view, #user-dashboard-view, #user-dar-objeto-view { display: none; flex-direction: column; padding: 20px 0; min-height: 0; overflow: auto; }
-    #user-login-view.visible, #user-dashboard-view.visible, #user-dar-objeto-view.visible { display: flex; }
+    #user-login-view, #user-dashboard-view, #user-dar-objeto-view, #user-dar-panes-view { display: none; flex-direction: column; padding: 20px 0; min-height: 0; overflow: auto; }
+    #user-login-view.visible, #user-dashboard-view.visible, #user-dar-objeto-view.visible, #user-dar-panes-view.visible { display: flex; }
     #user-login-view .field { max-width: 320px; }
     #user-dashboard-view .personajes-list { max-height: 360px; overflow: auto; border: 1px solid var(--input-border); border-radius: 8px; padding: 8px; background: #f8fafc; }
-    #user-dashboard-view .personaje-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; font-size: 0.9rem; border-radius: 6px; margin-bottom: 6px; background: #fff; border: 1px solid var(--input-border); }
+    #user-dashboard-view .personaje-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; padding: 10px 12px; font-size: 0.9rem; border-radius: 6px; margin-bottom: 6px; background: #fff; border: 1px solid var(--input-border); }
     #user-dashboard-view .personaje-row:last-child { margin-bottom: 0; }
-    #user-dashboard-view .personaje-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    #user-dashboard-view .personaje-row .personaje-nombre { text-align: left; }
+    #user-dashboard-view .personaje-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     #user-dashboard-view .btn-dar { padding: 6px 14px; font-size: 0.85rem; font-weight: 600; background: var(--btn-primary); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; text-decoration: none; }
     #user-dashboard-view .btn-dar:hover { background: var(--btn-hover); }
     #user-dashboard-view .btn-inventario { padding: 6px 14px; font-size: 0.85rem; font-weight: 600; background: #475569; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; text-decoration: none; }
@@ -320,7 +385,16 @@
     #user-dar-objeto-view .list-item-objeto.selected { background: #dcfce7; color: var(--btn-primary); }
     #user-dar-objeto-view .input-ids { margin-top: 8px; padding: 10px 12px; font-size: 0.95rem; border: 2px solid var(--input-border); border-radius: 6px; min-height: 80px; resize: vertical; font-family: inherit; }
     #user-dar-objeto-view .input-ids:focus { border-color: var(--btn-primary); outline: none; }
-    @media (max-width: 640px) { #user-dar-objeto-view .dar-layout { grid-template-columns: 1fr; } }
+    .obj-nivel { color: #64748b; font-size: 0.85em; }
+    #user-dashboard-view .btn-dar-panes { padding: 6px 14px; font-size: 0.85rem; font-weight: 600; background: #b45309; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; text-decoration: none; }
+    #user-dashboard-view .btn-dar-panes:hover { background: #d97706; }
+    #user-dar-panes-view .dar-panes-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; min-height: 0; }
+    #user-dar-panes-view .dar-panes-layout .dar-panes-list-wrap { grid-column: 1 / -1; min-width: 0; }
+    #user-dar-panes-view .list-wrap-panes { max-height: 280px; overflow: auto; border: 1px solid var(--input-border); border-radius: 8px; padding: 8px; background: #f8fafc; width: 100%; box-sizing: border-box; }
+    #user-dar-panes-view .list-item-pan { padding: 8px 10px; font-size: 0.9rem; border-radius: 4px; cursor: pointer; }
+    #user-dar-panes-view .list-item-pan:hover { background: #e2e8f0; }
+    #user-dar-panes-view .list-item-pan.selected { background: #fef3c7; border: 1px solid #f59e0b; }
+    @media (max-width: 640px) { #user-dar-objeto-view .dar-layout { grid-template-columns: 1fr; } #user-dar-panes-view .dar-panes-layout { grid-template-columns: 1fr; } }
 
     #admin-login-view, #admin-panel-view { display: none; flex-direction: column; padding: 20px 0; }
     #admin-login-view.visible, #admin-panel-view.visible { display: flex; }
@@ -345,6 +419,11 @@
     #admin-panel-view .admin-dar-left, #admin-panel-view .admin-dar-right { display: flex; flex-direction: column; min-width: 0; }
     #admin-panel-view .list-item-objeto { padding: 6px 10px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; }
     #admin-panel-view .list-item-objeto:hover { background: #e2e8f0; }
+    #admin-panel-view .list-item-pan { padding: 6px 10px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; }
+    #admin-panel-view .list-item-pan:hover { background: #e2e8f0; }
+    #admin-panel-view .list-item-pan.selected { background: #fef3c7; border: 1px solid #f59e0b; }
+    #admin-section-dar-panes .admin-dar-layout .admin-panes-list-wrap { grid-column: 1 / -1; min-width: 0; }
+    #admin-section-dar-panes .admin-panes-list-wrap .list-wrap-objetos { width: 100%; box-sizing: border-box; }
     @media (max-width: 640px) { #admin-panel-view .admin-dar-layout { grid-template-columns: 1fr; } }
     .back-link { font-size: 0.85rem; margin-bottom: 16px; }
     .back-link a { color: #64748b; text-decoration: none; }
@@ -362,10 +441,6 @@
     <div class="panel-right">
       <div id="form-view">
         <p class="form-title">Registro de cuenta</p>
-        <p class="top-links">
-          <a href="#login" id="link-login">Iniciar sesión</a>
-          <a href="#admin-login" id="link-admin">Acceso admin</a>
-        </p>
         <div class="global-error" id="global-error" role="alert"></div>
         <form id="registro-form" novalidate method="post" action="javascript:void(0);">
           <div class="form-columns">
@@ -456,8 +531,11 @@
                 <span class="field-msg" id="msg-apodo"></span>
               </div>
             </div>
-            <div class="submit-wrap">
+            <div class="form-actions-grid">
               <button type="button" class="btn-submit" id="btn-submit">Registrarme</button>
+              <a href="https://drive.google.com/drive/folders/1v2NV3JXkkQTtwGweteXnVQELqvk8HRP3?usp=sharing" target="_blank" rel="noopener noreferrer" class="btn-action-link">Descargar cliente</a>
+              <a href="#login" id="link-login" class="btn-action-link">Iniciar sesión</a>
+              <a href="#admin-login" id="link-admin" class="btn-action-link btn-special">Acceso admin</a>
             </div>
           </div>
         </form>
@@ -488,6 +566,7 @@
         <div class="admin-nav">
           <button type="button" data-section="personajes">Ver personajes</button>
           <button type="button" data-section="dar">Dar objeto(s)</button>
+          <button type="button" data-section="dar-panes">Dar panes</button>
         </div>
 
         <div id="admin-section-personajes" class="admin-section">
@@ -497,8 +576,16 @@
         <div id="admin-section-dar" class="admin-section">
           <div class="admin-dar-layout">
             <div class="admin-dar-left">
-              <label for="admin-dar-busqueda" style="font-size: 0.75rem; font-weight: 600; color: #475569;">Buscar objeto</label>
-              <input type="text" id="admin-dar-busqueda" class="busqueda-objetos" placeholder="Nombre o ID del objeto" style="margin-bottom: 8px; padding: 8px 12px; font-size: 0.95rem; border: 2px solid var(--input-border); border-radius: 6px;">
+              <p class="form-title" style="margin-bottom: 8px;">Buscar objeto</p>
+              <div class="filtro-objetos-stack">
+                <label for="admin-dar-busqueda" style="font-size: 0.75rem; font-weight: 600; color: #475569;">Nombre o ID</label>
+                <input type="text" id="admin-dar-busqueda" class="busqueda-objetos filtro-input" placeholder="Nombre o ID">
+                <label for="admin-objeto-nivel-min" style="font-size: 0.75rem; font-weight: 600; color: #475569; margin-top: 10px;">Nivel mínimo</label>
+                <input type="number" id="admin-objeto-nivel-min" min="0" class="filtro-input" placeholder="Opcional">
+                <label for="admin-objeto-nivel-max" style="font-size: 0.75rem; font-weight: 600; color: #475569; margin-top: 10px;">Nivel máximo</label>
+                <input type="number" id="admin-objeto-nivel-max" min="0" class="filtro-input" placeholder="Opcional">
+                <button type="button" id="admin-buscar-objetos-btn" class="btn-buscar" title="Buscar" style="margin-top: 10px; padding: 8px 14px; border: none; border-radius: 6px; background: var(--btn-primary); color: #fff; cursor: pointer; font-size: 1rem;">&#128269;</button>
+              </div>
               <div class="list-wrap-objetos" id="admin-dar-list-objetos" style="max-height: 280px; overflow: auto; border: 1px solid var(--input-border); border-radius: 8px; padding: 8px; background: #f8fafc;"></div>
             </div>
             <div class="admin-dar-right">
@@ -513,6 +600,39 @@
               </div>
               <div class="global-error" id="dar-objetos-error"></div>
               <p id="dar-objetos-ok" style="display:none; color: var(--valid); font-size: 0.9rem; margin-top: 8px;"></p>
+            </div>
+          </div>
+        </div>
+        <div id="admin-section-dar-panes" class="admin-section">
+          <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 12px;">Elige personaje, un pan y la cantidad.</p>
+          <div class="admin-dar-layout">
+            <div class="admin-dar-left">
+              <p class="form-title" style="margin-bottom: 8px;">Lista de panes</p>
+              <div class="filtro-panes-stack">
+                <label for="admin-filtro-panes" style="font-size: 0.75rem; font-weight: 600; color: #475569;">Nombre o ID</label>
+                <input type="text" id="admin-filtro-panes" class="filtro-panes filtro-input" placeholder="Nombre o ID">
+                <label for="admin-panes-nivel-min" style="font-size: 0.75rem; font-weight: 600; color: #475569; margin-top: 10px;">Nivel mínimo</label>
+                <input type="number" id="admin-panes-nivel-min" min="0" class="filtro-input" placeholder="Opcional">
+                <label for="admin-panes-nivel-max" style="font-size: 0.75rem; font-weight: 600; color: #475569; margin-top: 10px;">Nivel máximo</label>
+                <input type="number" id="admin-panes-nivel-max" min="0" class="filtro-input" placeholder="Opcional">
+                <button type="button" id="admin-buscar-panes-btn" class="btn-buscar" title="Buscar" style="margin-top: 10px; padding: 8px 14px; border: none; border-radius: 6px; background: var(--btn-primary); color: #fff; cursor: pointer; font-size: 1rem;">&#128269;</button>
+              </div>
+            </div>
+            <div class="admin-dar-right">
+              <label for="admin-dar-panes-personaje" style="font-size: 0.75rem; font-weight: 600; color: #475569;">Personaje</label>
+              <select id="admin-dar-panes-personaje" style="margin-top: 4px; margin-bottom: 12px; padding: 8px 12px; font-size: 0.95rem; border: 2px solid var(--input-border); border-radius: 6px; width: 100%;">
+                <option value="">Selecciona un personaje</option>
+              </select>
+              <label for="admin-panes-cantidad" style="font-size: 0.75rem; font-weight: 600; color: #475569;">Cantidad</label>
+              <input type="number" id="admin-panes-cantidad" min="1" max="999" value="1" style="margin-top: 8px; margin-bottom: 12px; padding: 8px 12px; font-size: 0.95rem; border: 2px solid var(--input-border); border-radius: 6px; width: 100px;">
+              <div class="submit-wrap" style="margin-top: 12px;">
+                <button type="button" class="btn-submit" id="admin-dar-panes-btn">Dar panes</button>
+              </div>
+              <div class="global-error" id="admin-dar-panes-error"></div>
+              <p id="admin-dar-panes-ok" style="display:none; color: var(--valid); font-size: 0.9rem; margin-top: 8px;"></p>
+            </div>
+            <div class="admin-panes-list-wrap">
+              <div class="list-wrap-objetos" id="admin-list-panes" style="max-height: 280px; overflow: auto; border: 1px solid var(--input-border); border-radius: 8px; padding: 8px; background: #f8fafc;"></div>
             </div>
           </div>
         </div>
@@ -553,8 +673,16 @@
         <p class="form-title" id="user-dar-titulo">Dar objeto a personaje</p>
         <div class="dar-layout">
           <div class="dar-left">
-            <label for="busqueda-objetos" style="font-size: 0.75rem; font-weight: 600; color: #475569;">Buscar objeto</label>
-            <input type="text" id="busqueda-objetos" class="busqueda-objetos" placeholder="Nombre o ID del objeto">
+            <p class="form-title" style="margin-bottom: 8px;">Buscar objeto</p>
+            <div class="filtro-objetos-stack">
+              <label for="busqueda-objetos" style="font-size: 0.75rem; font-weight: 600; color: #475569;">Nombre o ID</label>
+              <input type="text" id="busqueda-objetos" class="busqueda-objetos filtro-input" placeholder="Nombre o ID">
+              <label for="user-objeto-nivel-min" style="font-size: 0.75rem; font-weight: 600; color: #475569; margin-top: 10px;">Nivel mínimo</label>
+              <input type="number" id="user-objeto-nivel-min" min="0" class="filtro-input" placeholder="Opcional">
+              <label for="user-objeto-nivel-max" style="font-size: 0.75rem; font-weight: 600; color: #475569; margin-top: 10px;">Nivel máximo</label>
+              <input type="number" id="user-objeto-nivel-max" min="0" class="filtro-input" placeholder="Opcional">
+              <button type="button" id="user-buscar-objetos-btn" class="btn-buscar" title="Buscar" style="margin-top: 10px; padding: 8px 14px; border: none; border-radius: 6px; background: var(--btn-primary); color: #fff; cursor: pointer; font-size: 1rem;">&#128269;</button>
+            </div>
             <div class="list-wrap-objetos" id="list-objetos-user"></div>
           </div>
           <div class="dar-right">
@@ -565,6 +693,37 @@
             </div>
             <div class="global-error" id="user-dar-error"></div>
             <p id="user-dar-ok" style="display:none; color: var(--valid); font-size: 0.9rem; margin-top: 8px;"></p>
+          </div>
+        </div>
+      </div>
+
+      <div id="user-dar-panes-view">
+        <p class="back-link"><a href="#dashboard">&larr; Volver al dashboard</a></p>
+        <p class="form-title" id="user-dar-panes-titulo">Dar panes al personaje</p>
+        <div class="dar-panes-layout">
+          <div>
+            <p class="form-title" style="margin-bottom: 8px;">Elige un pan</p>
+            <div class="filtro-panes-stack">
+              <label for="user-filtro-panes" style="font-size: 0.75rem; font-weight: 600; color: #475569;">Nombre o ID</label>
+              <input type="text" id="user-filtro-panes" class="filtro-panes filtro-input" placeholder="Nombre o ID">
+              <label for="user-panes-nivel-min" style="font-size: 0.75rem; font-weight: 600; color: #475569; margin-top: 10px;">Nivel mínimo</label>
+              <input type="number" id="user-panes-nivel-min" min="0" class="filtro-input" placeholder="Opcional">
+              <label for="user-panes-nivel-max" style="font-size: 0.75rem; font-weight: 600; color: #475569; margin-top: 10px;">Nivel máximo</label>
+              <input type="number" id="user-panes-nivel-max" min="0" class="filtro-input" placeholder="Opcional">
+              <button type="button" id="user-buscar-panes-btn" class="btn-buscar" title="Buscar" style="margin-top: 10px; padding: 8px 14px; border: none; border-radius: 6px; background: var(--btn-primary); color: #fff; cursor: pointer; font-size: 1rem;">&#128269;</button>
+            </div>
+          </div>
+          <div>
+            <label for="user-panes-cantidad" style="font-size: 0.75rem; font-weight: 600; color: #475569;">Cantidad</label>
+            <input type="number" id="user-panes-cantidad" min="1" max="999" value="1" style="margin-top: 8px; padding: 10px 12px; font-size: 0.95rem; border: 2px solid var(--input-border); border-radius: 6px; width: 100px;">
+            <div class="submit-wrap" style="margin-top: 12px;">
+              <button type="button" class="btn-submit" id="user-dar-panes-btn">Dar panes</button>
+            </div>
+            <div class="global-error" id="user-dar-panes-error"></div>
+            <p id="user-dar-panes-ok" style="display:none; color: var(--valid); font-size: 0.9rem; margin-top: 8px;"></p>
+          </div>
+          <div class="dar-panes-list-wrap">
+            <div class="list-wrap-panes" id="user-list-panes"></div>
           </div>
         </div>
       </div>
@@ -593,6 +752,18 @@
   var btnSubmit = document.getElementById('btn-submit');
   var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   var cuentaRegex = /^[a-zA-Z0-9_]{3,30}$/;
+  function filterListByLevel(list, minStr, maxStr) {
+    var minVal = (minStr !== '' && minStr != null && !isNaN(parseInt(minStr, 10))) ? parseInt(minStr, 10) : null;
+    var maxVal = (maxStr !== '' && maxStr != null && !isNaN(parseInt(maxStr, 10))) ? parseInt(maxStr, 10) : null;
+    if (minVal === null && maxVal === null) return list;
+    var effectiveMin = minVal != null ? minVal : 1;
+    var effectiveMax = maxVal != null ? maxVal : 200;
+    return list.filter(function (o) {
+      var niv = (o.nivel != null && o.nivel !== '') ? parseInt(o.nivel, 10) : 0;
+      if (isNaN(niv)) niv = 0;
+      return niv >= effectiveMin && niv <= effectiveMax;
+    });
+  }
   function getField(name) { return form.querySelector('[name="' + name + '"]'); }
   function getFieldContainer(name) { return form.querySelector('.field[data-name="' + name + '"]'); }
   function getMsgEl(name) { return document.getElementById('msg-' + name); }
@@ -673,7 +844,7 @@
     console.log('[registro-app] enviarRegistro() llamado');
     hideGlobalError();
     if (!runValidation()) { console.log('[registro-app] validaci\u00f3n fallida'); showGlobalError('Revisa los campos marcados y compl\u00e9talos correctamente.'); return; }
-    if (btnSubmit) btnSubmit.disabled = true;
+    if (btnSubmit) { btnSubmit.textContent = 'Cargando'; btnSubmit.disabled = true; }
     var formData = new FormData(form);
     formData.delete('pass2');
     var body = Object.fromEntries(formData);
@@ -687,13 +858,13 @@
         } else {
           console.log('[registro-app] BE error:', result.data);
           showGlobalError((result.data && result.data.message) || 'Error al registrar. Intenta de nuevo.');
-          if (btnSubmit) btnSubmit.disabled = false;
+          if (btnSubmit) { btnSubmit.textContent = 'Registrarme'; btnSubmit.disabled = false; }
         }
       })
       .catch(function (err) {
         console.log('[registro-app] error conexi\u00f3n BE:', err);
         showGlobalError('Error de conexi\u00f3n. Comprueba que el servidor est\u00e9 activo.');
-        if (btnSubmit) btnSubmit.disabled = false;
+        if (btnSubmit) { btnSubmit.textContent = 'Registrarme'; btnSubmit.disabled = false; }
       });
   }
   if (btnSubmit) {
@@ -719,6 +890,7 @@
   var userLoginView = document.getElementById('user-login-view');
   var userDashboardView = document.getElementById('user-dashboard-view');
   var userDarObjetoView = document.getElementById('user-dar-objeto-view');
+  var userDarPanesView = document.getElementById('user-dar-panes-view');
   var userInventarioView = document.getElementById('user-inventario-view');
   var adminInventarioView = document.getElementById('admin-inventario-view');
   var adminPasswordInput = document.getElementById('admin-password');
@@ -741,14 +913,35 @@
     return cuentaId ? { 'X-Cuenta-Id': cuentaId, 'Content-Type': 'application/json' } : {};
   }
 
+  function filterListByLevel(list, minStr, maxStr) {
+    var minVal = (minStr !== '' && minStr != null && !isNaN(parseInt(minStr, 10))) ? parseInt(minStr, 10) : null;
+    var maxVal = (maxStr !== '' && maxStr != null && !isNaN(parseInt(maxStr, 10))) ? parseInt(maxStr, 10) : null;
+    if (minVal === null && maxVal === null) return list;
+    var effectiveMin = minVal != null ? minVal : 1;
+    var effectiveMax = maxVal != null ? maxVal : 200;
+    return list.filter(function (o) {
+      var niv = (o.nivel != null && o.nivel !== '') ? parseInt(o.nivel, 10) : 0;
+      if (isNaN(niv)) niv = 0;
+      return niv >= effectiveMin && niv <= effectiveMax;
+    });
+  }
+
   function showView(which) {
     if (formView) { formView.classList.remove('hidden'); if (which !== 'form') formView.classList.add('hidden'); }
     if (successView) { successView.classList.remove('visible'); if (which === 'success') successView.classList.add('visible'); }
     if (adminLoginView) { adminLoginView.classList.remove('visible'); if (which === 'admin-login') adminLoginView.classList.add('visible'); }
     if (adminPanelView) { adminPanelView.classList.remove('visible'); if (which === 'admin') adminPanelView.classList.add('visible'); }
-    if (userLoginView) { userLoginView.classList.remove('visible'); if (which === 'user-login') userLoginView.classList.add('visible'); }
+    if (userLoginView) {
+      userLoginView.classList.remove('visible');
+      if (which === 'user-login') {
+        userLoginView.classList.add('visible');
+        var loginBtn = document.getElementById('user-login-btn');
+        if (loginBtn) { loginBtn.textContent = 'Entrar'; loginBtn.disabled = false; }
+      }
+    }
     if (userDashboardView) { userDashboardView.classList.remove('visible'); if (which === 'user-dashboard') userDashboardView.classList.add('visible'); }
     if (userDarObjetoView) { userDarObjetoView.classList.remove('visible'); if (which === 'user-dar-objeto') userDarObjetoView.classList.add('visible'); }
+    if (userDarPanesView) { userDarPanesView.classList.remove('visible'); if (which === 'user-dar-panes') userDarPanesView.classList.add('visible'); }
     if (userInventarioView) { userInventarioView.classList.remove('visible'); if (which === 'user-inventario') userInventarioView.classList.add('visible'); }
     if (adminInventarioView) { adminInventarioView.classList.remove('visible'); if (which === 'admin-inventario') adminInventarioView.classList.add('visible'); }
   }
@@ -763,7 +956,19 @@
     if (sectionId === 'personajes') loadPersonajes();
     if (sectionId === 'dar') {
       fillDarPersonajes();
-      loadAdminDarObjetos();
+      var listEl = document.getElementById('admin-dar-list-objetos');
+      if (listEl) listEl.innerHTML = 'Haz clic en la lupa para buscar (nombre y/o nivel mín./máx.).';
+      var busq = document.getElementById('admin-dar-busqueda');
+      if (busq) busq.value = '';
+      var nmin = document.getElementById('admin-objeto-nivel-min');
+      var nmax = document.getElementById('admin-objeto-nivel-max');
+      if (nmin) nmin.value = '';
+      if (nmax) nmax.value = '';
+    }
+    if (sectionId === 'dar-panes') {
+      fillAdminDarPanesPersonajes();
+      var listPanes = document.getElementById('admin-list-panes');
+      if (listPanes) listPanes.innerHTML = 'Haz clic en la lupa para buscar (nombre y/o nivel mín./máx.).';
     }
   }
 
@@ -793,6 +998,8 @@
       showView('user-login');
       var errEl = document.getElementById('user-login-error');
       if (errEl) { errEl.textContent = ''; errEl.classList.remove('visible'); }
+      var loginBtn = document.getElementById('user-login-btn');
+      if (loginBtn) { loginBtn.textContent = 'Entrar'; loginBtn.disabled = false; }
     } else if (base === 'dashboard') {
       if (!sessionStorage.getItem(USER_CUENTA_ID)) {
         window.location.hash = 'login';
@@ -809,6 +1016,14 @@
       }
       showView('user-dar-objeto');
       initUserDarObjeto(parseInt(params.id, 10));
+    } else if (base === 'dar-panes' && params.id) {
+      if (!sessionStorage.getItem(USER_CUENTA_ID)) {
+        window.location.hash = 'login';
+        showView('user-login');
+        return;
+      }
+      showView('user-dar-panes');
+      initUserDarPanes(parseInt(params.id, 10));
     } else if (base === 'inventario' && params.id) {
       if (!sessionStorage.getItem(USER_CUENTA_ID)) {
         window.location.hash = 'login';
@@ -896,7 +1111,7 @@
           return;
         }
         listEl.innerHTML = list.map(function (p) {
-          return '<div class="personaje-row"><span><strong>' + (p.nombre || '-') + '</strong> (nivel ' + (p.nivel || 0) + ')</span><div class="personaje-actions"><a href="#dar-objeto?id=' + p.id + '" class="btn-dar">Dar objeto</a><a href="#inventario?id=' + p.id + '" class="btn-inventario">Ver objetos en inventario</a></div></div>';
+          return '<div class="personaje-row"><span class="personaje-nombre"><strong>' + (p.nombre || '-') + '</strong> (nivel ' + (p.nivel || 0) + ')</span><div class="personaje-actions"><a href="#dar-objeto?id=' + p.id + '" class="btn-dar">Dar objeto</a><a href="#dar-panes?id=' + p.id + '" class="btn-dar-panes">Dar panes</a><a href="#inventario?id=' + p.id + '" class="btn-inventario">Ver objetos en inventario</a></div></div>';
         }).join('');
       })
       .catch(function () { listEl.innerHTML = 'Error al cargar personajes.'; });
@@ -915,8 +1130,60 @@
     document.getElementById('user-dar-error').classList.remove('visible');
     document.getElementById('user-dar-ok').style.display = 'none';
     document.getElementById('busqueda-objetos').value = '';
-    loadUserObjetos('');
+    var nivelMinEl = document.getElementById('user-objeto-nivel-min');
+    var nivelMaxEl = document.getElementById('user-objeto-nivel-max');
+    if (nivelMinEl) nivelMinEl.value = '';
+    if (nivelMaxEl) nivelMaxEl.value = '';
+    document.getElementById('list-objetos-user').innerHTML = 'Haz clic en la lupa para buscar (nombre y/o nivel mín./máx.).';
   }
+
+  var userDarPanesPersonajeId = null;
+  function initUserDarPanes(personajeId) {
+    userDarPanesPersonajeId = personajeId;
+    var titulo = document.getElementById('user-dar-panes-titulo');
+    if (titulo) titulo.textContent = 'Dar panes al personaje (ID ' + personajeId + ')';
+    document.getElementById('user-panes-cantidad').value = '1';
+    document.getElementById('user-dar-panes-error').textContent = '';
+    document.getElementById('user-dar-panes-error').classList.remove('visible');
+    document.getElementById('user-dar-panes-ok').style.display = 'none';
+    var listEl = document.getElementById('user-list-panes');
+    if (listEl) listEl.innerHTML = 'Haz clic en la lupa para buscar (nombre y/o nivel mín./máx.).';
+  }
+  function renderUserPanesList() {
+    var listEl = document.getElementById('user-list-panes');
+    var rawList = window._userPanesList || [];
+    var nivelMinEl = document.getElementById('user-panes-nivel-min');
+    var nivelMaxEl = document.getElementById('user-panes-nivel-max');
+    var list = filterListByLevel(rawList, nivelMinEl ? nivelMinEl.value : '', nivelMaxEl ? nivelMaxEl.value : '');
+    if (!listEl) return;
+    listEl.innerHTML = list.length ? list.map(function (o) {
+      var niv = (o.nivel != null && o.nivel !== '') ? o.nivel : 0;
+      return '<div class="list-item-pan" data-id="' + o.id + '">' + o.id + ' &ndash; ' + (o.nombre || '-') + ' <span class="obj-nivel">(nivel ' + niv + ')</span></div>';
+    }).join('') : 'Ningún pan coincide con el filtro (nombre y rango de nivel).';
+    listEl.querySelectorAll('.list-item-pan').forEach(function (el) {
+      el.addEventListener('click', function () {
+        listEl.querySelectorAll('.list-item-pan').forEach(function (e) { e.classList.remove('selected'); });
+        el.classList.add('selected');
+      });
+    });
+  }
+  function loadUserPanes() {
+    var listEl = document.getElementById('user-list-panes');
+    if (!listEl) return;
+    var q = (document.getElementById('user-filtro-panes') && document.getElementById('user-filtro-panes').value || '').trim();
+    var params = [];
+    if (q) params.push('q=' + encodeURIComponent(q));
+    listEl.innerHTML = 'Cargando...';
+    fetch('/api/user/panes' + (params.length ? '?' + params.join('&') : ''), { headers: getUserHeaders(), cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data || !data.success) { listEl.innerHTML = 'No autorizado o sin panes configurados.'; return; }
+        window._userPanesList = data.data || [];
+        renderUserPanesList();
+      })
+      .catch(function () { listEl.innerHTML = 'Error al cargar.'; });
+  }
+  document.getElementById('user-buscar-panes-btn') && document.getElementById('user-buscar-panes-btn').addEventListener('click', loadUserPanes);
 
   function initUserInventario(personajeId) {
     var titulo = document.getElementById('user-inventario-titulo');
@@ -1006,42 +1273,53 @@
       });
   }
 
-  function loadUserObjetos(q) {
+  function loadUserObjetos() {
     var listEl = document.getElementById('list-objetos-user');
+    if (!listEl) return;
+    var q = (document.getElementById('busqueda-objetos') && document.getElementById('busqueda-objetos').value || '').trim();
+    var nivelMin = document.getElementById('user-objeto-nivel-min') && document.getElementById('user-objeto-nivel-min').value;
+    var nivelMax = document.getElementById('user-objeto-nivel-max') && document.getElementById('user-objeto-nivel-max').value;
     listEl.innerHTML = 'Cargando...';
-    var url = '/api/user/objetos';
-    if (q) url += '?q=' + encodeURIComponent(q);
-    fetch(url, { headers: getUserHeaders() })
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        if (!data.success) {
+    var params = [];
+    if (q) params.push('q=' + encodeURIComponent(q));
+    var url = '/api/user/objetos' + (params.length ? '?' + params.join('&') : '');
+    fetch(url, { headers: getUserHeaders(), cache: 'no-store' })
+      .then(function (r) { return r.text(); })
+      .then(function (text) {
+        var data;
+        try { data = text ? JSON.parse(text) : null; } catch (e) { listEl.innerHTML = 'Error: respuesta no es JSON v\u00e1lido.'; return; }
+        if (!data || !data.success) {
           listEl.innerHTML = 'No autorizado o error.';
           return;
         }
-        var list = data.data || [];
-        listEl.innerHTML = list.length ? list.map(function (o) {
-          return '<div class="list-item-objeto" data-id="' + o.id + '" data-nombre="' + (o.nombre || '').replace(/"/g, '&quot;') + '">' + o.id + ' &ndash; ' + (o.nombre || '-') + '</div>';
-        }).join('') : 'Escribe en el buscador para filtrar.';
-        listEl.querySelectorAll('.list-item-objeto').forEach(function (el) {
-          el.addEventListener('click', function () {
-            var id = el.getAttribute('data-id');
-            var idsEl = document.getElementById('user-dar-ids');
-            var actual = (idsEl.value || '').trim();
-            var ids = actual ? actual.split(/[,\s|]+/).map(function (s) { return s.trim(); }).filter(Boolean) : [];
-            if (ids.indexOf(id) === -1) ids.push(id);
-            idsEl.value = ids.join(', ');
+        var list = filterListByLevel(data.data || [], nivelMin, nivelMax);
+        try {
+          listEl.innerHTML = list.length ? list.map(function (o) {
+            var niv = (o.nivel != null && o.nivel !== '') ? o.nivel : 0;
+            var nom = o.nombre != null ? String(o.nombre) : '';
+            return '<div class="list-item-objeto" data-id="' + o.id + '" data-nombre="' + nom.replace(/"/g, '&quot;') + '">' + o.id + ' &ndash; ' + (nom || '-') + ' <span class="obj-nivel">(nivel ' + niv + ')</span></div>';
+          }).join('') : 'Haz clic en la lupa para buscar (nombre y/o nivel mín./máx.).';
+          listEl.querySelectorAll('.list-item-objeto').forEach(function (el) {
+            el.addEventListener('click', function () {
+              var id = el.getAttribute('data-id');
+              var idsEl = document.getElementById('user-dar-ids');
+              var actual = (idsEl.value || '').trim();
+              var ids = actual ? actual.split(/[,\s|]+/).map(function (s) { return s.trim(); }).filter(Boolean) : [];
+              if (ids.indexOf(id) === -1) ids.push(id);
+              idsEl.value = ids.join(', ');
+            });
           });
-        });
+        } catch (err) {
+          listEl.innerHTML = 'Error al mostrar la lista.';
+          console.error('loadUserObjetos render:', err);
+        }
       })
-      .catch(function () { listEl.innerHTML = 'Error al cargar.'; });
+      .catch(function (err) {
+        listEl.innerHTML = 'Error al cargar.';
+        console.error('loadUserObjetos:', err);
+      });
   }
-
-  document.getElementById('busqueda-objetos') && document.getElementById('busqueda-objetos').addEventListener('input', function () {
-    var q = this.value.trim();
-    var t = window._userObjetosDebounce;
-    if (t) clearTimeout(t);
-    window._userObjetosDebounce = setTimeout(function () { loadUserObjetos(q); }, 300);
-  });
+  document.getElementById('user-buscar-objetos-btn') && document.getElementById('user-buscar-objetos-btn').addEventListener('click', function () { loadUserObjetos(); });
 
   document.getElementById('user-dar-btn') && document.getElementById('user-dar-btn').addEventListener('click', function () {
     var idsEl = document.getElementById('user-dar-ids');
@@ -1083,8 +1361,52 @@
       });
   });
 
+  document.getElementById('user-dar-panes-btn') && document.getElementById('user-dar-panes-btn').addEventListener('click', function () {
+    var listEl = document.getElementById('user-list-panes');
+    var selected = listEl && listEl.querySelector('.list-item-pan.selected');
+    var objetoId = selected ? parseInt(selected.getAttribute('data-id'), 10) : null;
+    var cantidadEl = document.getElementById('user-panes-cantidad');
+    var cantidad = cantidadEl ? parseInt(cantidadEl.value, 10) : 1;
+    var errorEl = document.getElementById('user-dar-panes-error');
+    var okEl = document.getElementById('user-dar-panes-ok');
+    errorEl.textContent = '';
+    errorEl.classList.remove('visible');
+    okEl.style.display = 'none';
+    if (!userDarPanesPersonajeId || !objetoId) {
+      errorEl.textContent = 'Elige un pan de la lista.';
+      errorEl.classList.add('visible');
+      return;
+    }
+    if (isNaN(cantidad) || cantidad < 1) cantidad = 1;
+    if (!getUserHeaders()['X-Cuenta-Id']) {
+      errorEl.textContent = 'Sesi\u00f3n expirada. Vuelve a iniciar sesi\u00f3n.';
+      errorEl.classList.add('visible');
+      return;
+    }
+    fetch('/api/user/dar-panes', {
+      method: 'POST',
+      headers: getUserHeaders(),
+      body: JSON.stringify({ personajeId: userDarPanesPersonajeId, objetoId: objetoId, cantidad: cantidad })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.success) {
+          okEl.textContent = data.message || 'Panes a\u00f1adidos.';
+          okEl.style.display = 'block';
+        } else {
+          errorEl.textContent = data.message || 'Error al dar panes.';
+          errorEl.classList.add('visible');
+        }
+      })
+      .catch(function () {
+        errorEl.textContent = 'Error de conexi\u00f3n.';
+        errorEl.classList.add('visible');
+      });
+  });
+
   if (document.getElementById('user-login-btn')) {
     document.getElementById('user-login-btn').addEventListener('click', function () {
+      var btn = this;
       var cuenta = (document.getElementById('user-login-cuenta') && document.getElementById('user-login-cuenta').value || '').trim();
       var pass = (document.getElementById('user-login-password') && document.getElementById('user-login-password').value) || "";
       var errEl = document.getElementById('user-login-error');
@@ -1095,34 +1417,51 @@
         errEl.classList.add('visible');
         return;
       }
+      btn.textContent = 'Cargando';
+      btn.disabled = true;
       fetch('/api/user/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cuenta: cuenta, contrase\u00f1a: pass })
       })
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-          if (data.success) {
+        .then(function (r) {
+          return r.text().then(function (text) {
+            var data = null;
+            try { data = text ? JSON.parse(text) : null; } catch (e) {}
+            return { ok: r.ok, status: r.status, data: data };
+          });
+        })
+        .then(function (result) {
+          var data = result.data;
+          var considerSuccess = result.ok || (result.status === 500 && data && data.success);
+          if (considerSuccess && data && data.success) {
             sessionStorage.setItem(USER_CUENTA_ID, String(data.cuentaId));
             sessionStorage.setItem(USER_CUENTA, data.cuenta || cuenta);
             window.location.hash = 'dashboard';
           } else {
-            errEl.textContent = data.message || 'Cuenta o contrase\u00f1a incorrectos.';
+            errEl.textContent = (data && data.message) ? data.message : (result.ok ? 'Cuenta o contrase\u00f1a incorrectos.' : 'Error del servidor. Si ya est\u00e1s logueado, recarga la p\u00e1gina.');
             errEl.classList.add('visible');
+            btn.textContent = 'Entrar';
+            btn.disabled = false;
           }
         })
         .catch(function () {
           errEl.textContent = 'Error de conexi\u00f3n.';
           errEl.classList.add('visible');
+          btn.textContent = 'Entrar';
+          btn.disabled = false;
         });
     });
   }
 
   if (adminLoginBtn) {
     adminLoginBtn.addEventListener('click', function () {
+      var btn = this;
       var pass = (adminPasswordInput && adminPasswordInput.value) || '';
       adminLoginError.textContent = '';
       if (!pass) { adminLoginError.textContent = 'Escribe la contraseña.'; adminLoginError.classList.add('visible'); return; }
+      btn.textContent = 'Cargando';
+      btn.disabled = true;
       fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pass }) })
         .then(function (r) { return r.json(); })
         .then(function (data) {
@@ -1132,12 +1471,16 @@
           } else {
             adminLoginError.textContent = 'Contraseña incorrecta.';
             adminLoginError.classList.add('visible');
+            btn.textContent = 'Entrar';
+            btn.disabled = false;
             setTimeout(function () { window.location.hash = ''; }, 1500);
           }
         })
         .catch(function () {
           adminLoginError.textContent = 'Error de conexión.';
           adminLoginError.classList.add('visible');
+          btn.textContent = 'Entrar';
+          btn.disabled = false;
         });
     });
   }
@@ -1170,30 +1513,38 @@
 
   function loadAdminDarObjetos() {
     var listEl = document.getElementById('admin-dar-list-objetos');
-    var busquedaEl = document.getElementById('admin-dar-busqueda');
+    var q = (document.getElementById('admin-dar-busqueda') && document.getElementById('admin-dar-busqueda').value || '').trim();
+    var nivelMin = document.getElementById('admin-objeto-nivel-min') && document.getElementById('admin-objeto-nivel-min').value;
+    var nivelMax = document.getElementById('admin-objeto-nivel-max') && document.getElementById('admin-objeto-nivel-max').value;
     if (!listEl) return;
     listEl.innerHTML = 'Cargando...';
-    fetch('/api/admin/objetos', { headers: getAdminHeaders() })
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        if (!data.success) { listEl.innerHTML = 'No autorizado o error.'; return; }
-        window._adminObjetos = data.data || [];
+    var params = [];
+    if (q) params.push('q=' + encodeURIComponent(q));
+    var url = '/api/admin/objetos' + (params.length ? '?' + params.join('&') : '');
+    fetch(url, { headers: getAdminHeaders(), cache: 'no-store' })
+      .then(function (r) { return r.text(); })
+      .then(function (text) {
+        var data;
+        try { data = text ? JSON.parse(text) : null; } catch (e) { listEl.innerHTML = 'Error: respuesta no es JSON v\u00e1lido.'; return; }
+        if (!data || !data.success) { listEl.innerHTML = 'No autorizado o error.'; return; }
+        window._adminObjetos = filterListByLevel(data.data || [], nivelMin, nivelMax);
         renderAdminDarObjetos();
       })
-      .catch(function () { listEl.innerHTML = 'Error al cargar.'; });
+      .catch(function (err) {
+        listEl.innerHTML = 'Error al cargar.';
+        console.error('loadAdminDarObjetos:', err);
+      });
   }
 
   function renderAdminDarObjetos() {
     var listEl = document.getElementById('admin-dar-list-objetos');
-    var busquedaEl = document.getElementById('admin-dar-busqueda');
     if (!listEl) return;
     var list = window._adminObjetos || [];
-    var q = (busquedaEl && busquedaEl.value || '').toLowerCase().trim();
-    if (q) list = list.filter(function (o) { return ((o.nombre || '') + ' ' + (o.id || '')).toLowerCase().indexOf(q) !== -1; });
-    list = list.slice(0, 300);
     listEl.innerHTML = list.length ? list.map(function (o) {
-      return '<div class="list-item-objeto" data-id="' + o.id + '">' + o.id + ' &ndash; ' + (o.nombre || '-').replace(/"/g, '&quot;') + '</div>';
-    }).join('') : 'Escribe en el buscador para filtrar.';
+      var niv = (o.nivel != null && o.nivel !== '') ? o.nivel : 0;
+      var nom = o.nombre != null ? String(o.nombre) : '-';
+      return '<div class="list-item-objeto" data-id="' + o.id + '">' + o.id + ' &ndash; ' + nom.replace(/"/g, '&quot;') + ' <span class="obj-nivel">(nivel ' + niv + ')</span></div>';
+    }).join('') : 'Haz clic en la lupa para buscar (nombre y/o nivel mín./máx.).';
     listEl.querySelectorAll('.list-item-objeto').forEach(function (el) {
       el.addEventListener('click', function () {
         var id = el.getAttribute('data-id');
@@ -1206,13 +1557,7 @@
       });
     });
   }
-
-  var adminDarBusquedaEl = document.getElementById('admin-dar-busqueda');
-  if (adminDarBusquedaEl) {
-    adminDarBusquedaEl.addEventListener('input', function () {
-      if (window._adminObjetos) renderAdminDarObjetos();
-    });
-  }
+  document.getElementById('admin-buscar-objetos-btn') && document.getElementById('admin-buscar-objetos-btn').addEventListener('click', function () { loadAdminDarObjetos(); });
 
   function fillDarPersonajes() {
     darPersonajeSelect.innerHTML = '<option value="">Cargando...</option>';
@@ -1229,6 +1574,59 @@
       })
       .catch(function () { darPersonajeSelect.innerHTML = '<option value="">Error al cargar</option>'; });
   }
+
+  function fillAdminDarPanesPersonajes() {
+    var sel = document.getElementById('admin-dar-panes-personaje');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Cargando...</option>';
+    fetch('/api/admin/personajes', { headers: getAdminHeaders() })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        sel.innerHTML = '<option value="">Selecciona un personaje</option>';
+        (data.data || []).forEach(function (p) {
+          var opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = (p.nombre || '') + ' (ID ' + p.id + ')';
+          sel.appendChild(opt);
+        });
+      })
+      .catch(function () { sel.innerHTML = '<option value="">Error al cargar</option>'; });
+  }
+  function renderAdminPanesList() {
+    var listEl = document.getElementById('admin-list-panes');
+    var rawList = window._adminPanesList || [];
+    var nivelMinEl = document.getElementById('admin-panes-nivel-min');
+    var nivelMaxEl = document.getElementById('admin-panes-nivel-max');
+    var list = filterListByLevel(rawList, nivelMinEl ? nivelMinEl.value : '', nivelMaxEl ? nivelMaxEl.value : '');
+    if (!listEl) return;
+    listEl.innerHTML = list.length ? list.map(function (o) {
+      var niv = (o.nivel != null && o.nivel !== '') ? o.nivel : 0;
+      return '<div class="list-item-pan" data-id="' + o.id + '">' + o.id + ' &ndash; ' + (o.nombre || '-') + ' <span class="obj-nivel">(nivel ' + niv + ')</span></div>';
+    }).join('') : 'Ningún pan coincide con el filtro (nombre y rango de nivel).';
+    listEl.querySelectorAll('.list-item-pan').forEach(function (el) {
+      el.addEventListener('click', function () {
+        listEl.querySelectorAll('.list-item-pan').forEach(function (e) { e.classList.remove('selected'); });
+        el.classList.add('selected');
+      });
+    });
+  }
+  function loadAdminPanes() {
+    var listEl = document.getElementById('admin-list-panes');
+    if (!listEl) return;
+    var q = (document.getElementById('admin-filtro-panes') && document.getElementById('admin-filtro-panes').value || '').trim();
+    var params = [];
+    if (q) params.push('q=' + encodeURIComponent(q));
+    listEl.innerHTML = 'Cargando...';
+    fetch('/api/admin/panes' + (params.length ? '?' + params.join('&') : ''), { headers: getAdminHeaders(), cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data || !data.success) { listEl.innerHTML = 'No autorizado o sin panes configurados.'; return; }
+        window._adminPanesList = data.data || [];
+        renderAdminPanesList();
+      })
+      .catch(function () { listEl.innerHTML = 'Error al cargar.'; });
+  }
+  document.getElementById('admin-buscar-panes-btn') && document.getElementById('admin-buscar-panes-btn').addEventListener('click', loadAdminPanes);
 
   var adminDarBtn = document.getElementById('admin-dar-btn');
   if (adminDarBtn) {
@@ -1268,6 +1666,55 @@
         .catch(function () {
           darObjetosError.textContent = 'Error de conexión.';
           darObjetosError.classList.add('visible');
+        });
+    });
+  }
+
+  var adminDarPanesBtn = document.getElementById('admin-dar-panes-btn');
+  if (adminDarPanesBtn) {
+    adminDarPanesBtn.addEventListener('click', function () {
+      var listEl = document.getElementById('admin-list-panes');
+      var selected = listEl && listEl.querySelector('.list-item-pan.selected');
+      var objetoId = selected ? parseInt(selected.getAttribute('data-id'), 10) : null;
+      var personajeSel = document.getElementById('admin-dar-panes-personaje');
+      var personajeId = personajeSel && personajeSel.value ? parseInt(personajeSel.value, 10) : null;
+      var cantidadEl = document.getElementById('admin-panes-cantidad');
+      var cantidad = cantidadEl ? parseInt(cantidadEl.value, 10) : 1;
+      var errorEl = document.getElementById('admin-dar-panes-error');
+      var okEl = document.getElementById('admin-dar-panes-ok');
+      errorEl.textContent = '';
+      errorEl.classList.remove('visible');
+      okEl.style.display = 'none';
+      if (!personajeId || !objetoId) {
+        errorEl.textContent = 'Selecciona personaje y un pan.';
+        errorEl.classList.add('visible');
+        return;
+      }
+      if (isNaN(cantidad) || cantidad < 1) cantidad = 1;
+      var headers = getAdminHeaders();
+      if (!headers['X-Admin-Password']) {
+        errorEl.textContent = 'Sesi\u00f3n admin expirada.';
+        errorEl.classList.add('visible');
+        return;
+      }
+      fetch('/api/admin/dar-panes', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ personajeId: personajeId, objetoId: objetoId, cantidad: cantidad })
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.success) {
+            okEl.textContent = data.message || 'Panes a\u00f1adidos.';
+            okEl.style.display = 'block';
+          } else {
+            errorEl.textContent = data.message || 'Error al dar panes.';
+            errorEl.classList.add('visible');
+          }
+        })
+        .catch(function () {
+          errorEl.textContent = 'Error de conexi\u00f3n.';
+          errorEl.classList.add('visible');
         });
     });
   }
