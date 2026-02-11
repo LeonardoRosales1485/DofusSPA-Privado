@@ -428,6 +428,90 @@
     .back-link { font-size: 0.85rem; margin-bottom: 16px; }
     .back-link a { color: #64748b; text-decoration: none; }
     .back-link a:hover { text-decoration: underline; }
+
+    /* --- Mobile / tablet responsiveness --- */
+    @media (max-width: 900px) {
+      html, body {
+        height: auto;
+        overflow: auto;
+      }
+      body {
+        align-items: flex-start;
+        padding: 12px;
+      }
+      .container {
+        flex-direction: column;
+        height: auto;
+        max-height: none;
+      }
+      .panel-left {
+        width: 100%;
+        min-width: 0;
+        padding: 20px 16px;
+        min-height: 140px;
+      }
+      .panel-left h1 {
+        font-size: 1.4rem;
+      }
+      .panel-right {
+        width: 100%;
+        min-width: 0;
+        padding: 16px 16px 20px;
+      }
+      .form-columns {
+        grid-template-columns: 1fr;
+        gap: 10px 0;
+      }
+      .form-columns .form-col {
+        min-width: 0;
+      }
+      .form-actions-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      #user-dashboard-view .personaje-row {
+        grid-template-columns: 1fr;
+        row-gap: 8px;
+      }
+      #admin-panel-view .admin-nav {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 8px;
+      }
+      .container {
+        border-radius: 8px;
+        box-shadow: 0 12px 25px -8px rgba(0,0,0,0.45);
+      }
+      .panel-left {
+        padding: 16px 14px;
+      }
+      .panel-left h1 {
+        font-size: 1.25rem;
+      }
+      .panel-right {
+        padding: 14px 14px 18px;
+      }
+      .form-actions-grid {
+        grid-template-columns: 1fr;
+      }
+      .form-actions-grid .btn-submit,
+      .form-actions-grid .btn-action-link {
+        width: 100%;
+      }
+      .top-links a {
+        width: 100%;
+        text-align: center;
+      }
+      #user-dar-objeto-view .dar-layout,
+      #user-dar-panes-view .dar-panes-layout,
+      #admin-panel-view .admin-dar-layout {
+        gap: 16px;
+      }
+    }
   </style>
 </head>
 <body>
