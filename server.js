@@ -46,6 +46,18 @@ app.get('/api/serve-favicon', (req, res) => {
   }
 });
 
+app.get('/api/serve-noimg', (req, res) => {
+  try {
+    const noimgPath = path.join(DIST, 'api', 'user', 'items', 'noimg.jpg');
+    const buffer = fs.readFileSync(noimgPath);
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.status(200).send(buffer);
+  } catch (err) {
+    res.status(404).end();
+  }
+});
+
 app.post('/api/registro', async (req, res) => {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
 

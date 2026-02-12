@@ -1471,7 +1471,7 @@
                     var sub = n < 10 ? n : Math.floor(n / 10);
                     return '/api/user/items/' + sub + '/' + n + '.png';
                   }
-                  var noImgUrl = '/api/user/items/noimg.jpg';
+                  var noImgUrl = '/api/serve-noimg';
                   function parseStatsModelo(str) {
                     if (!str || typeof str !== 'string') return [];
                     var out = [];
