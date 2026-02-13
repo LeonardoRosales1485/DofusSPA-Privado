@@ -199,7 +199,7 @@ async function userInventario(req, res) {
   }
 }
 
-// --- User: dar-objetos ---
+// --- User: dar-objetos (con stats desde objetos_modelo, igual que admin) ---
 async function userDarObjetos(req, res) {
   const body = req.body || {};
   const cuentaId = parseInt(req.headers['x-cuenta-id'] || body.cuentaId, 10);
@@ -209,29 +209,55 @@ async function userDarObjetos(req, res) {
   if (!personajeId || isNaN(personajeId) || objetoIds.length === 0) {
     return res.status(400).json({ success: false, message: 'Faltan personaje o IDs de objetos.' });
   }
-  let conn;
+  let connD;
+  let connE;
   try {
-    conn = await mysql.createConnection(getDbConfig());
-    const [[row]] = await conn.execute('SELECT id, objetos, cuenta FROM personajes WHERE id = ?', [personajeId]);
+    connD = await mysql.createConnection(getDbConfig(process.env.DB_DINAMICOS || 'bustar_dinamicos'));
+    const [[row]] = await connD.execute('SELECT id, objetos, cuenta FROM personajes WHERE id = ?', [personajeId]);
     if (!row) return res.status(404).json({ success: false, message: 'Personaje no encontrado.' });
     if (Number(row.cuenta) !== cuentaId) return res.status(403).json({ success: false, message: 'Solo puedes dar objetos a tus propios personajes.' });
-    const [[{ maxId }]] = await conn.execute('SELECT COALESCE(MAX(id), 0) AS maxId FROM objetos');
+
+    connE = await mysql.createConnection(getDbConfig(process.env.DB_ESTATICOS || 'bustar_estaticos'));
+    const placeholders = objetoIds.map(() => '?').join(',');
+    const [modeloRows] = await connE.execute(
+      'SELECT id, COALESCE(statsModelo, "") AS statsModelo FROM objetos_modelo WHERE id IN (' + placeholders + ')',
+      objetoIds
+    );
+    const statsByModelo = {};
+    for (const r of modeloRows || []) {
+      const statsVal = r.statsModelo != null ? r.statsModelo : (r.statsmodelo != null ? r.statsmodelo : '');
+      statsByModelo[r.id] = statsVal || '';
+    }
+
+    const missing = objetoIds.filter((id) => statsByModelo[id] === undefined);
+    if (missing.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Estos IDs de modelo no existen en la BD estática (objetos_modelo). El juego los borraría al arrancar: ' + missing.join(', '),
+        missingModeloIds: missing,
+      });
+    }
+
+    const [[{ maxId }]] = await connD.execute('SELECT COALESCE(MAX(id), 0) AS maxId FROM objetos');
     let nextId = Number(maxId) + 1;
     const newInstanceIds = [];
     for (const modeloId of objetoIds) {
-      await conn.execute('INSERT INTO objetos (id, modelo, cantidad, posicion, stats, objevivo, precio) VALUES (?, ?, 1, -1, ?, 0, 0)', [nextId, modeloId, '']);
+      const statsModelo = statsByModelo[modeloId] != null ? statsByModelo[modeloId] : '';
+      const stats = statsModelo ? generateStatsFromModelo(statsModelo) : '';
+      await connD.execute('INSERT INTO objetos (id, modelo, cantidad, posicion, stats, objevivo, precio) VALUES (?, ?, 1, -1, ?, 0, 0)', [nextId, modeloId, stats]);
       newInstanceIds.push(nextId);
       nextId += 1;
     }
     const actual = String(row.objetos || '').trim();
     const concatenado = actual ? (actual + '|' + newInstanceIds.join('|')) : newInstanceIds.join('|');
-    await conn.execute('UPDATE personajes SET objetos = ? WHERE id = ?', [concatenado, personajeId]);
+    await connD.execute('UPDATE personajes SET objetos = ? WHERE id = ?', [concatenado, personajeId]);
     res.status(200).json({ success: true, message: 'Objetos añadidos al inventario.' });
   } catch (err) {
     console.error('[handler user/dar-objetos]', err.message);
     res.status(500).json({ success: false, message: 'Error al actualizar inventario.' });
   } finally {
-    if (conn) try { conn.end(); } catch (e) {}
+    if (connD) try { connD.end(); } catch (e) {}
+    if (connE) try { connE.end(); } catch (e) {}
   }
 }
 
@@ -351,7 +377,21 @@ async function adminDarObjetos(req, res) {
       objetoIds
     );
     const statsByModelo = {};
-    for (const r of modeloRows || []) statsByModelo[r.id] = r.statsModelo || '';
+    for (const r of modeloRows || []) {
+      const statsVal = r.statsModelo != null ? r.statsModelo : (r.statsmodelo != null ? r.statsmodelo : '');
+      statsByModelo[r.id] = statsVal || '';
+    }
+
+    // El juego al arrancar BORRA objetos cuyo modelo no está en bustar_estaticos.objetos_modelo.
+    // Solo dar objetos cuyos modelos existen en la BD estática (la misma que usa el Game).
+    const missing = objetoIds.filter((id) => statsByModelo[id] === undefined);
+    if (missing.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Estos IDs de modelo no existen en la BD estática (objetos_modelo). El juego los borraría al arrancar: ' + missing.join(', '),
+        missingModeloIds: missing,
+      });
+    }
 
     const [[{ maxId }]] = await connD.execute('SELECT COALESCE(MAX(id), 0) AS maxId FROM objetos');
     let nextId = Number(maxId) + 1;
