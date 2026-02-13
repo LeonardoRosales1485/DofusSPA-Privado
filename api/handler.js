@@ -253,8 +253,13 @@ async function userDarObjetos(req, res) {
     await connD.execute('UPDATE personajes SET objetos = ? WHERE id = ?', [concatenado, personajeId]);
     res.status(200).json({ success: true, message: 'Objetos añadidos al inventario.' });
   } catch (err) {
-    console.error('[handler user/dar-objetos]', err.message);
-    res.status(500).json({ success: false, message: 'Error al actualizar inventario.' });
+    console.error('[handler user/dar-objetos]', err.message, err.code || '');
+    res.status(500).json({
+      success: false,
+      message: 'Error al actualizar inventario.',
+      error: err.message || String(err),
+      code: err.code || undefined,
+    });
   } finally {
     if (connD) try { connD.end(); } catch (e) {}
     if (connE) try { connE.end(); } catch (e) {}
