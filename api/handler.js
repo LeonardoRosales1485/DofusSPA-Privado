@@ -220,13 +220,13 @@ async function userDarObjetos(req, res) {
     connE = await mysql.createConnection(getDbConfig(process.env.DB_ESTATICOS || 'bustar_estaticos'));
     const placeholders = objetoIds.map(() => '?').join(',');
     const [modeloRows] = await connE.execute(
-      'SELECT id, COALESCE(statsModelo, "") AS statsModelo FROM objetos_modelo WHERE id IN (' + placeholders + ')',
+      'SELECT * FROM objetos_modelo WHERE id IN (' + placeholders + ')',
       objetoIds
     );
     const statsByModelo = {};
     for (const r of modeloRows || []) {
-      const statsVal = r.statsModelo != null ? r.statsModelo : (r.statsmodelo != null ? r.statsmodelo : '');
-      statsByModelo[r.id] = statsVal || '';
+      const statsVal = (r.statsModelo ?? r.stats_modelo ?? r.statsmodelo ?? r[''] ?? '').toString().trim();
+      statsByModelo[r.id] = statsVal;
     }
 
     const missing = objetoIds.filter((id) => statsByModelo[id] === undefined);
@@ -378,13 +378,13 @@ async function adminDarObjetos(req, res) {
     connE = await mysql.createConnection(getDbConfig(process.env.DB_ESTATICOS || 'bustar_estaticos'));
     const placeholders = objetoIds.map(() => '?').join(',');
     const [modeloRows] = await connE.execute(
-      'SELECT id, COALESCE(statsModelo, "") AS statsModelo FROM objetos_modelo WHERE id IN (' + placeholders + ')',
+      'SELECT * FROM objetos_modelo WHERE id IN (' + placeholders + ')',
       objetoIds
     );
     const statsByModelo = {};
     for (const r of modeloRows || []) {
-      const statsVal = r.statsModelo != null ? r.statsModelo : (r.statsmodelo != null ? r.statsmodelo : '');
-      statsByModelo[r.id] = statsVal || '';
+      const statsVal = (r.statsModelo ?? r.stats_modelo ?? r.statsmodelo ?? r[''] ?? '').toString().trim();
+      statsByModelo[r.id] = statsVal;
     }
 
     // El juego al arrancar BORRA objetos cuyo modelo no está en bustar_estaticos.objetos_modelo.
